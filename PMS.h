@@ -69,10 +69,14 @@ int NormalVec(vector<vector<T> >& dataset)
 	return 0;
 }
 
+
+
 template<class T>
-int TransitMtx(vector<vector<T> > oData,vector<vector<T> >trasM,vector<vector<T> > & tData)
+vector<vector<T> > TransitMtx(vector<vector<T> > oData,vector<vector<T> >trasM)
 {
+	vector<vector<T> > tData;
 	tData.resize(oData.size(),vector<T>(trasM[0].size(),0.0));
+	
 	for (int i=0;i<oData.size();i++)
 	{
 
@@ -84,7 +88,7 @@ int TransitMtx(vector<vector<T> > oData,vector<vector<T> >trasM,vector<vector<T>
 			}
 		}
 	}
-	return 0;
+	return tData;
 }
 
 
@@ -129,6 +133,8 @@ int MAxInd(vector<T> data)
 	}
 	return ind;
 };
+
+
 struct featype
 {
 	featype()
@@ -153,9 +159,35 @@ struct featype
 			fprintf(fp,"%lf ",t.feature[i]);
 		}
 	};
+	vector<double> toVdouble()
+	{
+		vector<double> res;
+		res.resize(128,0.0);
+		for (int i=0;i<128;i++)
+		{
+			res[i]=feature[i];
+		}
+	//	res.push_back(pos.x);
+	//	res.push_back(pos.y);
+
+		return res;
+	};
 
 };
 
+
+static vector<vector<double> > addPositionsToData(vector<vector<double> > data,vector<featype> feas)
+{
+	vector<vector<double> > result(data);
+	//	result=;
+	assert(data.size()==feas.size());
+	for (int i=0;i<result.size();i++)
+	{
+		result[i].push_back(feas[i].pos.x);
+		result[i].push_back(feas[i].pos.y);
+	}
+	return result;
+}
 
 class PMStruc
 {
