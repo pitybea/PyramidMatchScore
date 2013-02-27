@@ -1,8 +1,12 @@
+#include <opencv2/core/core.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <vector>
 #include <string>
 #include <map>
 #include <math.h>
 using namespace std;
+using namespace cv;
 
 template<class T>
 static void prshl(vector<T> p,int n,vector<int>& index)
@@ -124,7 +128,34 @@ int MAxInd(vector<T> data)
 		}
 	}
 	return ind;
-}
+};
+struct featype
+{
+	featype()
+	{
+
+	};
+	Point pos;
+	double feature[128];
+	static void initOne(FILE* fp,featype &t)
+	{
+		fscanf(fp,"%d %d\n",&t.pos.x,&t.pos.y);
+		for (int i=0;i<128;i++)
+		{
+			fscanf(fp,"%lf ",&t.feature[i]);
+		}
+	};
+	static void printOne(FILE* fp, featype t)
+	{
+		fprintf(fp,"%d %d\n",t.pos.x,t.pos.y);
+		for (int i=0;i<128;i++)
+		{
+			fprintf(fp,"%lf ",t.feature[i]);
+		}
+	};
+
+};
+
 
 class PMStruc
 {
