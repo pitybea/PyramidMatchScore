@@ -1,4 +1,4 @@
 PyramidMatchScore
 =================
 
-file input and output in a very simple way
+A way to compute a so defined pyramid match score
