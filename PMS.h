@@ -192,24 +192,34 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 class PMStruc
 {
 public:
-	PMStruc(int i);
+	static enum PyrMode{normal,average};
+	PMStruc(int i,PyrMode p,string s);
+
+	PyrMode mymode;
+	string name;
 	int totalLvls;
+	int generatePymFromdata(vector<vector<double> > data);
+	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+	
+	
+	
+private:
 	int dataToPym(vector<vector<double> > data);
 	int dataToPymAver(vector<vector<double> > data);
-	double MatchDttoPym(vector<vector<double> > dataset);
-	double  MatchDttoPymAv(vector<vector<double> > dataset);
-private:
+
 	void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
+
 	void dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
 	void dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
-	int  matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB );
 
+	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+	double  MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 
-
-	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs );
+	int  matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
+	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
 	
 	vector<map<int,map<int,int> > > pym;
 	vector<vector<pair<double,double> > > aAbs;
 	vector<vector<vector<double> > > intvDecs;
-
+	vector<double> weights;
 };

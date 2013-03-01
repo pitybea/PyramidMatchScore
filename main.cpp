@@ -45,8 +45,8 @@ int main()
 	//NormalVec(dats);
 	fileIOclass::OutVectorSDouble("temp.txt",dats,true);
 
-	PMStruc pedmd(5);
-	pedmd.dataToPym(dats);
+	PMStruc pedmd(5,PMStruc::normal,"pym");
+	pedmd.generatePymFromdata(dats);
 
 	return 0;
 

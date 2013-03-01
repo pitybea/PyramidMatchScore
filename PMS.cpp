@@ -30,9 +30,16 @@ static float pow2[]=
 	8388608
 
 };
-PMStruc::PMStruc(int i)
+PMStruc::PMStruc(int i,PyrMode p,string s)
 {
 	totalLvls=i;
+	mymode=p;
+	name=s;
+	weights.resize(i,0.0);
+	for(int i=0;i<weights.size();i++)
+	{
+		weights[i]=pow2[i];
+	}
 }
 
 template<class T>
@@ -56,6 +63,37 @@ void dtmMinMx(vector<vector<T> > data,vector<pair<T,T> >& minmaxs)
 		}
 	}
 	
+}
+double PMStruc::givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel)
+{
+	switch (mymode)
+	{
+	case PMStruc::normal:
+		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel);
+		break;
+	case PMStruc::average:
+		return MatchDttoPymAv(dataset,ExcluMode,scoreAllLevel);
+		break;
+	default:
+		return 0.0;
+		break;
+	}
+}
+
+int PMStruc::generatePymFromdata(vector<vector<double> > data)
+{
+	switch (mymode)
+	{
+	case PMStruc::normal:
+		return dataToPym(data);
+		break;
+	case PMStruc::average:
+		return dataToPymAver(data);
+		break;
+	default:
+		return 0;
+		break;
+	}
 }
 
 void PMStruc::valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl)
@@ -132,6 +170,8 @@ void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<in
 
 	}
 }
+
+
 
 int invdvalue(double a,vector<double> inv)
 {
@@ -319,7 +359,7 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 	
 	return 0;
 }
-int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs )
+int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs,bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
 	int dimension=dataset[0].size();
@@ -371,17 +411,29 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 		{
 			if (pmlv[fisI].count(secI)>0)
 			{
-				if (pmlv[fisI][secI]>0)
+				if(ExcluMode)
 				{
-					res+=1;
-					pmlv[fisI][secI]=-1;
+					if (pmlv[fisI][secI]>1)
+					{
+						res+=1;
+						pmlv[fisI][secI]-=1;
+					}
 				}
+				else
+				{	
+					if (pmlv[fisI][secI]>0)
+					{
+						res+=1;
+						pmlv[fisI][secI]-=1;
+					}
+				}
+
 			}
 		}
 	}
 	return res;
 }
-int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB )
+int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
 	int dimension=dataset[0].size();
@@ -432,10 +484,21 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 		{
 			if (pmlv[fisI].count(secI)>0)
 			{
-				if (pmlv[fisI][secI]>0)
+				if(ExcluMode)
 				{
-					res+=1;
-					pmlv[fisI][secI]=-1;
+					if (pmlv[fisI][secI]>1)
+					{
+						res+=1;
+						pmlv[fisI][secI]-=1;
+					}
+				}
+				else 
+					{
+						if (pmlv[fisI][secI]>0)
+						{
+							res+=1;
+							pmlv[fisI][secI]-=1;
+						}
 				}
 			}
 		}
@@ -443,46 +506,49 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 	return res;
 }
 
-double PMStruc::MatchDttoPym(vector<vector<double> > dataset)
+double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers)
 {
-	vector<int> mnumbers;
+	//vector<int> mnumbers;
 	mnumbers.resize(pym.size(),0);
 	for (int i=0;i<mnumbers.size();i++)
 	{
-		mnumbers[i]=matchDToOneLv(dataset,i,pym[i],aAbs[i]);
+		mnumbers[i]=matchDToOneLv(dataset,i,pym[i],aAbs[i],ExcluMode);
 	}
 	for (int i=0;i<mnumbers.size()-1;i++)
 	{
 		mnumbers[i]=mnumbers[i]-mnumbers[i+1];
 	}
-	vector<double> weights;
-	weights.resize(pym.size(),0.0);
+	//vector<double> weights;
+	//weights.resize(pym.size(),0.0);
 	double reslt(0.0);
 	for (int i=0;i<pym.size();i++)
 	{
-		reslt+=mnumbers[i]*pow2[i]*dataset[0].size();
+		reslt+=mnumbers[i]*weights[i]*dataset[0].size();
 	}
 	return reslt;
 }
 
-double PMStruc::MatchDttoPymAv(vector<vector<double> > dataset)
+
+
+
+double PMStruc::MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers)
 {
-	vector<int> mnumbers;
+	//vector<int> mnumbers;
 	mnumbers.resize(pym.size(),0);
 	for (int i=0;i<mnumbers.size();i++)
 	{
-		mnumbers[i]=matchDToOneLv(dataset,i,pym[i],intvDecs[i]);
+		mnumbers[i]=matchDToOneLv(dataset,i,pym[i],intvDecs[i],ExcluMode);
 	}
 	for (int i=0;i<mnumbers.size()-1;i++)
 	{
 		mnumbers[i]=mnumbers[i]-mnumbers[i+1];
 	}
-	vector<double> weights;
-	weights.resize(pym.size(),0.0);
+	//vector<double> weights;
+	//weights.resize(pym.size(),0.0);
 	double reslt(0.0);
 	for (int i=0;i<pym.size();i++)
 	{
-		reslt+=mnumbers[i]*pow2[i]*dataset[0].size();
+		reslt+=mnumbers[i]*weights[i]*dataset[0].size();
 	}
 	return reslt;
 }
