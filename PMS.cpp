@@ -198,6 +198,105 @@ int invdvalue(double a,vector<double> inv)
 	}
 	return re;
 }
+
+void printPyramidLv(map<int,map<int,int> > pymlv,FILE* fp)
+{
+	fprintf(fp,"%d\n",pymlv.size());
+	for(map<int,map<int,int> >::iterator ii=pymlv.begin(); ii!=pymlv.end(); ++ii)
+	{
+		int a=(*ii).first;
+		map<int,int> b=(*ii).second;
+		fprintf(fp,"%d %d\n",a,b.size());
+		for(map<int,int>::iterator ij=b.begin();ij!=b.end();++ij)
+		{
+			fprintf(fp,"%d %d\t",(*ij).first,(*ij).second);
+		}
+		fprintf(fp,"\n");
+	}
+
+}
+
+void printAandBs(vector<pair<double,double> > abs,FILE* fp)
+{
+	fprintf(fp,"%d\n",abs.size());
+	for(int i=0;i<abs.size();i++)
+	{
+		fprintf(fp,"%lf %lf\t",abs[i].first,abs[i].second);
+	}
+}
+void printintvDecs(vector<vector<double> > intvecs,FILE* fp)
+{
+	fprintf(fp,"%d\n",intvecs.size());
+	for(int i=0;i<intvecs.size();i++)
+	{
+		fprintf(fp,"%d\n",intvecs[i].size());
+		for (int j = 0; j < intvecs[i].size(); j++)
+		{
+			fprintf(fp,"%lf\t",intvecs[i][j]);
+		}
+		fprintf(fp,"\n");
+	}
+
+}
+void PMStruc::outToAFile(string filename)
+{
+	FILE* fp;
+	fp=fopen(filename.c_str(),"w");
+	fprintf(fp,"%s %d %d\n%d\n",name,mymode,totalLvls,pym.size());
+	for(int i=0;i<pym.size();i++)
+	{
+		printPyramidLv(pym[i],fp);
+		
+	}
+
+	switch (mymode)
+	{
+	case PMStruc::normal:
+		fprintf(fp,"%d\n",aAbs.size());
+		for (int i = 0; i < aAbs.size(); i++)
+		{
+			printAandBs(aAbs[i],fp);
+			fprintf(fp,"\n");
+		}
+		break;
+	case PMStruc::average:
+		fprintf(fp,"%d\n",intvDecs.size());
+		for (int i = 0; i < intvDecs.size(); i++)
+		{
+			printintvDecs(intvDecs[i],fp);
+		}
+
+		break;
+	default:
+		break;
+	}
+
+	
+
+
+	
+	fclose(fp);
+
+
+
+	FILE* ft;
+	string wFname=name+"_wgt.txt";
+	ft=fopen(wFname.c_str(),"w");
+	fprintf(ft,"%d\n",weights.size());
+	for(int i=0;i<weights.size();i++)
+	{
+		fprintf(ft,"%lf ",weights[i]);
+	}
+	fclose(ft);
+}
+
+void PMStruc::loadFromAFile(string filename)
+{
+	FILE* fp;
+	fp=fopen(filename.c_str(),"r");
+	fclose(fp);
+}
+
 void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl)
 {
 	int dimension=datas[0].size();

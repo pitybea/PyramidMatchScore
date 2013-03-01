@@ -175,6 +175,16 @@ struct featype
 
 };
 
+static vector<vector<double> > keepFirSevDims(vector<vector<double> > inp,int n)
+{
+	vector<vector<double> > results;
+	results.resize(inp.size(),vector<double>(0,0.0));
+	for (int i = 0; i < inp.size(); i++)
+	{
+		results[i].insert(results[i].end(),inp[i].begin(),inp[i].begin()+n);
+	}
+	return results;
+}
 
 static vector<vector<double> > addPositionsToData(vector<vector<double> > data,vector<featype> feas)
 {
@@ -200,8 +210,8 @@ public:
 	int totalLvls;
 	int generatePymFromdata(vector<vector<double> > data);
 	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
-	
-	
+	void outToAFile(string filename);
+	void loadFromAFile(string filename);
 	
 private:
 	int dataToPym(vector<vector<double> > data);

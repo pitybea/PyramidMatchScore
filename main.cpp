@@ -31,6 +31,7 @@ int main()
 	vector<vector<double> > TrmTx;
 	TrmTx=fileIOclass::InVectorSDouble("../DimensionReduction.txt");
 
+	TrmTx=keepFirSevDims(TrmTx,10);
 	vector<vector<double > >  dats;
 	dats.resize(allfeas.size(),vector<double>(0,0.0));
 	for (int i=0;i<dats.size();i++)
@@ -47,7 +48,7 @@ int main()
 
 	PMStruc pedmd(5,PMStruc::normal,"pym");
 	pedmd.generatePymFromdata(dats);
-
+	pedmd.outToAFile("firtem.txt");
 	return 0;
 
 }
