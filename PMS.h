@@ -202,8 +202,9 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 class PMStruc
 {
 public:
-	static enum PyrMode{normal,average};
+	static enum PyrMode{normal,average,unset};
 	PMStruc(int i,PyrMode p,string s);
+	PMStruc();
 
 	PyrMode mymode;
 	string name;

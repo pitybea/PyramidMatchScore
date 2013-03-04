@@ -24,6 +24,10 @@ int main()
 {
 	_chdir("E:\\uiucCars\\CarData\\TrainImages");
 
+	PMStruc ptem;
+
+	ptem.loadFromAFile("firtem.txt");
+
 	vector<featype> allfeas;
 	allfeas.clear();
 	allfeas=fileIOclass::InVector<featype>("allPostiveFeatures.txt");
@@ -49,6 +53,8 @@ int main()
 	PMStruc pedmd(5,PMStruc::normal,"pym");
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("firtem.txt");
+
+	
 	return 0;
 
 }

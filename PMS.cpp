@@ -30,6 +30,13 @@ static float pow2[]=
 	8388608
 
 };
+
+PMStruc::PMStruc()
+{
+	totalLvls=-1;
+	mymode=PMStruc::unset;
+	name="";
+}
 PMStruc::PMStruc(int i,PyrMode p,string s)
 {
 	totalLvls=i;
@@ -199,6 +206,29 @@ int invdvalue(double a,vector<double> inv)
 	return re;
 }
 
+map<int,map<int,int> > loadPyramidLv(FILE* fp)
+{
+	map<int,map<int,int> > result;
+	int pymlvS;
+	fscanf(fp,"%d\n",&pymlvS);
+	for (int i = 0; i < pymlvS; i++)
+	{
+		int a,bS;
+		fscanf(fp,"%d %d\n",&a,&bS);
+		map<int,int> b;
+		for (int j = 0; j < bS; j++)
+		{
+			int ta,tb;
+			fscanf(fp,"%d %d\t",&ta,&tb);
+			b.insert(pair<int,int>(ta,tb));
+		}
+
+		result.insert(pair<int,map<int,int> >(a,b));
+		fscanf(fp,"\n");
+	}
+	return result;
+}
+
 void printPyramidLv(map<int,map<int,int> > pymlv,FILE* fp)
 {
 	fprintf(fp,"%d\n",pymlv.size());
@@ -216,6 +246,20 @@ void printPyramidLv(map<int,map<int,int> > pymlv,FILE* fp)
 
 }
 
+vector<pair<double,double> > loadAandBsOne(FILE* fp)
+{
+	vector<pair<double,double> > result;
+	int abS;
+	fscanf(fp,"%d\n",&abS);
+	for (int i = 0; i < abS; i++)
+	{
+		double ta,tb;
+		fscanf(fp,"%lf %lf\t",&ta,&tb);
+		result.push_back(pair<double,double>(ta,tb));
+	}
+	return result;
+}
+
 void printAandBs(vector<pair<double,double> > abs,FILE* fp)
 {
 	fprintf(fp,"%d\n",abs.size());
@@ -223,6 +267,29 @@ void printAandBs(vector<pair<double,double> > abs,FILE* fp)
 	{
 		fprintf(fp,"%lf %lf\t",abs[i].first,abs[i].second);
 	}
+}
+
+vector<vector<double> > loadintvDecs(FILE* fp)
+{
+	vector<vector<double> > result;
+	int rSz;
+	fscanf(fp,"%d\n",&rSz);
+	for (int i = 0; i < rSz; i++)
+	{
+		int sSz;
+		fscanf(fp,"%d\n",&sSz);
+		vector<double> tvd;
+		tvd.clear();
+		tvd.resize(sSz,0.0);
+		for (int j = 0; j < sSz; j++)
+		{
+//			double td;
+			fprintf(fp,"%lf\t",tvd[j]);
+		}
+		fscanf(fp,"\n");
+		result.push_back(tvd);
+	}
+	return result;
 }
 void printintvDecs(vector<vector<double> > intvecs,FILE* fp)
 {
@@ -294,7 +361,64 @@ void PMStruc::loadFromAFile(string filename)
 {
 	FILE* fp;
 	fp=fopen(filename.c_str(),"r");
+	char tems[100];
+	int temsz;
+	fscanf(fp,"%s %d %d\n%d\n",&tems,&mymode,&totalLvls,&temsz);
+	string s(tems);
+	name=s;
+	pym.clear();
+	for (int i = 0; i < temsz; i++)
+	{
+		map<int,map<int,int> > pymlv=loadPyramidLv(fp);
+		
+		pym.push_back(pymlv);
+	}
+
+
+	switch (mymode)
+	{
+	case PMStruc::normal:
+		int abbS;
+		fscanf(fp,"%d\n",&abbS);
+		for (int i = 0; i < abbS; i++)
+		{
+			vector<pair<double,double> > abbOne;
+			abbOne=loadAandBsOne(fp);
+			aAbs.push_back(abbOne);
+		//	printAandBs(aAbs[i],fp);
+			fscanf(fp,"\n");
+		}
+		break;
+	case PMStruc::average:
+		int ivDS;
+		fscanf(fp,"%d\n",&ivDS);
+		for (int i = 0; i < ivDS; i++)
+		{
+			vector<vector<double> > indsOne;
+			indsOne=loadintvDecs(fp);
+			intvDecs.push_back(indsOne);
+		
+		}
+
+		break;
+	default:
+		break;
+	}
+
 	fclose(fp);
+	FILE* ft;
+	string wFname=name+"_wgt.txt";
+	ft=fopen(wFname.c_str(),"r");
+	int wSiz;
+	fscanf(ft,"%d\n",&wSiz);
+	weights.resize(wSiz,0.0);
+	for(int i=0;i<wSiz;i++)
+	{
+		fscanf(ft,"%lf ",&weights[i]);
+	}
+	fclose(ft);
+
+
 }
 
 void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl)
