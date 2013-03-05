@@ -213,6 +213,8 @@ public:
 	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 	void outToAFile(string filename);
 	void loadFromAFile(string filename);
+
+	
 	
 private:
 	int dataToPym(vector<vector<double> > data);
@@ -234,3 +236,21 @@ private:
 	vector<vector<vector<double> > > intvDecs;
 	vector<double> weights;
 };
+
+
+static vector<vector<double > > prepareData(vector<featype> allfeas, vector<vector<double> > TrmTx)
+{
+	vector<vector<double > >  dats;
+	dats.resize(allfeas.size(),vector<double>(0,0.0));
+	for (int i=0;i<dats.size();i++)
+	{
+		dats[i]=allfeas[i].toVdouble();
+	}
+	
+	ZeroMnVec(dats);
+	dats=TransitMtx(dats,TrmTx);
+	
+	dats=addPositionsToData(dats,allfeas);
+	return dats;
+}
+
