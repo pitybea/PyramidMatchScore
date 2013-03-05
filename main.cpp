@@ -54,7 +54,7 @@ void trainPositive()
 	//NormalVec(dats);
 	
 
-	PMStruc pedmd(5,PMStruc::normal,"pospym");
+	PMStruc pedmd(PMStruc::average,"pospym");
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("pospym.txt");
 }
@@ -82,7 +82,7 @@ void trainNegative()
 	//NormalVec(dats);
 	//fileIOclass::OutVectorSDouble("temp.txt",dats,true);
 
-	PMStruc pedmd(5,PMStruc::normal,"negpym");
+	PMStruc pedmd(PMStruc::normal,"negpym");
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("negpym.txt");
 }
@@ -118,8 +118,8 @@ static void generateNumsForPosTraining()
 int main()
 {
 	_chdir("E:\\uiucCars\\CarData\\TrainImages");
-//	trainPositive();
-//	trainNegative();
+
+	trainPositive();
 
 	vector<vector<int> > posnumbers;
 	vector<vector<int> > negnumbers;
@@ -170,7 +170,7 @@ int main__()
 	//NormalVec(dats);
 	fileIOclass::OutVectorSDouble("temp.txt",dats,true);
 
-	PMStruc pedmd(5,PMStruc::normal,"pym");
+	PMStruc pedmd(PMStruc::normal,"pym");
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("firtem.txt");
 

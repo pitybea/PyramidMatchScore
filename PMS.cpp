@@ -37,16 +37,17 @@ PMStruc::PMStruc()
 	mymode=PMStruc::unset;
 	name="";
 }
-PMStruc::PMStruc(int i,PyrMode p,string s)
+PMStruc::PMStruc(PyrMode p,string s)
 {
-	totalLvls=i;
+	totalLvls=0;
 	mymode=p;
 	name=s;
+	/*
 	weights.resize(i,0.0);
 	for(int i=0;i<weights.size();i++)
 	{
 		weights[i]=pow2[i];
-	}
+	}*/
 }
 
 template<class T>
@@ -112,8 +113,9 @@ void PMStruc::valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,i
 	aAndB.second=0-aAndB.first*minMax.first;
 }
 
-void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB)
+bool PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB)
 {
+	bool fineEngough=true;
 	int dimension=datas[0].size();
 	
 	int haldim=datas[0].size()/2;
@@ -161,6 +163,7 @@ void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<in
 			if (pymlvl[fisI].count(secI)>0)
 			{
 				pymlvl[fisI][secI]+=1;
+				fineEngough=false;
 				//	cout<<pymlvl[fisI][secI]<<endl;
 			}
 			else
@@ -176,6 +179,7 @@ void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<in
 		}
 
 	}
+	return fineEngough;
 }
 
 
@@ -198,7 +202,7 @@ int invdvalue(double a,vector<double> inv)
 	for (int i=0;i<inv.size()-1;i++)
 	{
 		re+=1;
-		if ((re>=inv[i])&&(re<inv[i+1]))
+		if ((a>=inv[i])&&(a<inv[i+1]))
 		{
 			return re;
 		}
@@ -421,10 +425,11 @@ void PMStruc::loadFromAFile(string filename)
 
 }
 
-void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl)
+bool PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl)
 {
-	int dimension=datas[0].size();
+	bool fineEngough=true;
 
+	int dimension=datas[0].size();
 	int haldim=datas[0].size()/2;
 	int twExM=pow2[lvel];
 
@@ -472,6 +477,7 @@ void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<in
 			if (pymlvl[fisI].count(secI)>0)
 			{
 				pymlvl[fisI][secI]+=1;
+				fineEngough=false;
 				//	cout<<pymlvl[fisI][secI]<<endl;
 			}
 			else
@@ -487,9 +493,38 @@ void PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<in
 		}
 
 	}
+	return fineEngough;
 }
 
+void dtinterv(vector<vector<double> > dataset,vector<double> & intvDec,int i,int goodi)
+{
+		vector<double> temvec;
+		temvec.resize(dataset.size(),0.0);
+		vector<int> inde_;
+		inde_.clear();
+		inde_.resize(dataset.size(),0);
+		for (int j=0;j<dataset.size();j++)
+		{
+			temvec[j]=dataset[j][i];
+			inde_[j]=j;
+		}
+		prshl(temvec,temvec.size(),inde_);
 
+		int jj=goodi;
+	
+		int tot=pow2[jj];
+		intvDec.clear();
+		if (tot>1)
+		{
+			int step=dataset.size()/tot;
+			for (int k=1;k<pow2[jj];k++)
+			{
+				intvDec.push_back(temvec[inde_[k*step]]);
+			}
+							
+		}
+		
+}
 
 int initintvs(vector<vector<vector<double> > > &intvDecs,vector<vector<double> > dataset )
 {
@@ -530,15 +565,40 @@ int PMStruc::dataToPymAver(vector<vector<double> > data)
 	if (data.size()>0)
 	{
 		int dimension=data[0].size();
-		
 		vector<double> tvd;
 		tvd.clear();
+
+		vector<vector<vector<double> > > intvDecs_;
+		intvDecs_.resize(10,vector<vector<double> >(dimension,tvd));
+		
+		initintvs(intvDecs_,data);
+		bool goGon=false;
+		int goodi=0;
+		while(!goGon&&goodi<10)
+		{
+			
+				//dtinterv(vector<vector<double> > data,vector<vector<double> >& intvDec,int i,int goodi);
+			intvDecs.push_back(intvDecs_[goodi]);
+
+			
+			map<int,map<int,int> > pymlv;
+			pymlv.clear();
+			
+			goGon=dataToPymLvl(data,goodi,pymlv,intvDecs_[goodi]);
+			pym.push_back(pymlv);
+
+			weights.push_back(pow2[goodi]);
+			goodi+=1;
+			totalLvls+=1;
+		}
+
+		/*
 		intvDecs.resize(totalLvls,vector<vector<double> >(dimension,tvd));
 		
 		initintvs(intvDecs,data);
-		//for(int lvel=0;lvel<totalLvls;lvel++)
-		//	for(int i=0;i<dimension;i++)
-		//		dtinterv(data,intvDecs[lvel][i],i,lvel);
+		for(int lvel=0;lvel<totalLvls;lvel++)
+			for(int i=0;i<dimension;i++)
+				dtinterv(data,intvDecs[lvel][i],i,lvel);
 
 		map<int,map<int,int> > pymlv;
 		pymlv.clear();
@@ -546,7 +606,7 @@ int PMStruc::dataToPymAver(vector<vector<double> > data)
 		for (int i=0;i<totalLvls;i++)
 		{
 			dataToPymLvl(data,i,pym[i],intvDecs[i]);
-		}
+		}*/
 
 	}
 
@@ -561,22 +621,28 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 		vector<pair<double,double> > minmax;
 		minmax.resize(data[0].size(),pair<double,double>(0.0,0.0));
 		dtmMinMx(data,minmax);
-		aAbs.resize(totalLvls,vector<pair<double,double> >(data[0].size(),pair<double,double>(0.0,0.0)));
-		for (int lvel=0;lvel<totalLvls;lvel++)
+
+		bool goGon=false;
+		int goodi=0;
+		while(!goGon)
 		{
+			vector<pair<double,double> > aAb;
+			aAb.resize(data[0].size(),pair<double,double>(0.0,0.0));
+
 			for (int i=0;i<data[0].size();i++)
 			{
-				//dtmMinMx(datas,i,minmax[i]);
-				valueToInx(minmax[i],aAbs[lvel][i],lvel);
+				valueToInx(minmax[i],aAb[i],goodi);
 			}
+			map<int,map<int,int> > pymlv;
+			goGon=dataToPymLvl(data,goodi,pymlv,aAb);
+			pym.push_back(pymlv);
+
+			aAbs.push_back(aAb);
+			weights.push_back(pow2[goodi]);
+			goodi+=1;
+			totalLvls+=1;
 		}
-		map<int,map<int,int> > pymlv;
-		pymlv.clear();
-		pym.resize(totalLvls,pymlv);
-		for (int i=0;i<totalLvls;i++)
-		{
-			dataToPymLvl(data,i,pym[i],aAbs[i]);
-		}
+	
 	
 	}
 	

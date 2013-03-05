@@ -204,8 +204,8 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 class PMStruc
 {
 public:
-	static enum PyrMode{normal,average,unset};
-	PMStruc(int i,PyrMode p,string s);
+	enum PyrMode{normal,average,unset};
+	PMStruc(PyrMode p,string s);
 	PMStruc();
 
 	PyrMode mymode;
@@ -226,8 +226,8 @@ private:
 
 	void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
 
-	void dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
-	void dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
+	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
+	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
 
 	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 	double  MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
