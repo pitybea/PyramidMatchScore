@@ -88,13 +88,8 @@ void trainNegative()
 }
 
 
-
-
-int main()
+static void generateNumsForPosTraining()
 {
-	_chdir("E:\\uiucCars\\CarData\\TrainImages");
-//	trainPositive();
-//	trainNegative();
 
 	vector<vector<double> > TrmTx;
 	TrmTx=fileIOclass::InVectorSDouble("../DimensionReduction.txt");
@@ -118,7 +113,29 @@ int main()
 		negnumbers.push_back(oneNumber(s,ptem,TrmTx));
 	
 	fileIOclass::OutVectorSInt("temnegnums",negnumbers,true);
+}
 
+int main()
+{
+	_chdir("E:\\uiucCars\\CarData\\TrainImages");
+//	trainPositive();
+//	trainNegative();
+
+	vector<vector<int> > posnumbers;
+	vector<vector<int> > negnumbers;
+	posnumbers=fileIOclass::InVectorSInt ("temposnums");
+	negnumbers=fileIOclass::InVectorSInt("temnegnums");
+
+	PMStruc ptem;
+	ptem.loadFromAFile("pospym.txt");
+
+	int num;
+	double value;
+	//num=ptem.TestTrain(posnumbers,negnumbers,value);
+	PMStrainer ptrainer(ptem,PMStrainer::allAtOnce,0.01,3.0);
+
+	ptrainer.Train(posnumbers,negnumbers);
+	ptrainer.OutTofile();
 	return 0;
 }
 

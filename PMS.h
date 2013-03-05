@@ -30,6 +30,8 @@ static void prshl(vector<T> p,int n,vector<int>& index)
 	}
 };
 
+
+
 template <class T,class U>
 int bendPsnToApea(vector<vector<T> > &features,vector<U> pts)
 {
@@ -209,11 +211,13 @@ public:
 	PyrMode mymode;
 	string name;
 	int totalLvls;
+	vector<double> weights;
+
 	int generatePymFromdata(vector<vector<double> > data);
 	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 	void outToAFile(string filename);
 	void loadFromAFile(string filename);
-
+	
 	
 	
 private:
@@ -231,12 +235,45 @@ private:
 	int  matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
 	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
 	
+	
+
 	vector<map<int,map<int,int> > > pym;
 	vector<vector<pair<double,double> > > aAbs;
 	vector<vector<vector<double> > > intvDecs;
-	vector<double> weights;
+	
+	
+
 };
 
+
+class PMStrainer
+{
+public:
+	enum TrainStrategy
+	{
+		allAtOnce,
+		oneAtOnce
+
+	};
+	PMStrainer(PMStruc pm,TrainStrategy s,double d,double l);
+	void Train(vector<vector<int> > posnums,vector<vector<int> > negnums);
+	void OutTofile();
+
+
+
+private:
+	PMStruc pmStrct;
+	TrainStrategy myStrgy;
+	double stepWidth;
+	double largeBand;
+	vector<double> bestWeights;
+	double bestDivScore;
+	int bestNumber;
+
+	void trainOneAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums);
+	void trainAllAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums);
+	int DecideBestScore(vector<double> temWeight,vector<vector<int> > posnums,vector<vector<int> > negnums,double& divValue);
+};
 
 static vector<vector<double > > prepareData(vector<featype> allfeas, vector<vector<double> > TrmTx)
 {

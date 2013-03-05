@@ -775,3 +775,276 @@ double PMStruc::MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,ve
 	}
 	return reslt;
 }
+
+double multiIVecDvec(vector<int> ivec,vector<double> dvec)
+{
+	assert(ivec.size()==dvec.size());
+	double result=0.0;
+	for (int i = 0; i < ivec.size(); i++)
+	{
+		result+=ivec[i]*dvec[i];
+	}
+	return result;
+}
+
+int PMStrainer::DecideBestScore(vector<double> temWeight,vector<vector<int> > posnums,vector<vector<int> > negnums,double& divValue)
+{
+	if(posnums.size()==0||negnums.size()==0)
+		return -1;
+
+	assert(temWeight.size()==posnums[0].size());
+	assert(temWeight.size()==negnums[0].size());
+
+	vector<double> allWeights;
+	allWeights.resize(posnums.size()+negnums.size(),0.0);
+	vector<int> orderIdx;
+	orderIdx.resize(posnums.size()+negnums.size(),0);
+
+	for (int i = 0; i < posnums.size(); i++)
+	{
+		allWeights[i]=multiIVecDvec(posnums[i],temWeight);
+		orderIdx[i]=i;
+	}
+	int tn=posnums.size();
+	for (int i = 0; i < negnums.size(); i++)
+	{
+		allWeights[tn+i]=multiIVecDvec(negnums[i],temWeight);
+		orderIdx[tn+i]=tn+i;
+	}
+	
+	vector<int> allLabels;
+	vector<int> tposL;
+	tposL.resize(posnums.size(),1);
+	allLabels.insert(allLabels.end(),tposL.begin(),tposL.end());
+	
+	vector<int> nposL;
+	nposL.resize(negnums.size(),-1);
+	allLabels.insert(allLabels.end(),nposL.begin(),nposL.end());
+
+	prshl(allWeights,allWeights.size(),orderIdx);
+	vector<int> PosCul;
+	vector<int> NegCul;
+	PosCul.resize(orderIdx.size(),0);
+	NegCul.resize(orderIdx.size(),0);
+
+	for(int i=0;i<orderIdx.size();i++)
+	{
+		int tlabel=allLabels[orderIdx[i]];
+		if (i==0)
+		{
+			if(tlabel>0)
+			{
+				PosCul[0]=1;
+				NegCul[0]=0;
+			}
+			else
+			{
+				PosCul[0]=0;
+				NegCul[0]=1;
+			}
+		}
+		else
+		{
+			if(tlabel>0)
+			{
+				PosCul[i]=PosCul[i-1]+1;
+				NegCul[i]=NegCul[i-1];
+			}
+			else
+			{
+				PosCul[i]=PosCul[i-1];
+				NegCul[i]=NegCul[i-1]+1;
+			}
+		}
+	}
+	int allposN,allnegN;
+	allposN=posnums.size();
+	allnegN=negnums.size();
+
+	int bestPosition=-1;
+	int bestNum=-1;
+
+	for (int i = 0; i < orderIdx.size()-1; i++)
+	{
+		int corNum=NegCul[i]+allposN-PosCul[i]+1;
+		if(corNum>bestNum)
+		{
+			bestPosition=i;
+			bestNum=corNum;
+		}
+	}
+	divValue=(allWeights[orderIdx[bestPosition]]+allWeights[orderIdx[bestPosition+1]])/2;
+	return bestNum;
+}
+
+
+	
+PMStrainer::PMStrainer(PMStruc pm,TrainStrategy s,double d,double l)
+{
+	myStrgy=s;
+	pmStrct=pm;
+	stepWidth=d;
+	largeBand=l;
+}
+
+void PMStrainer::Train(vector<vector<int> > posnums,vector<vector<int> > negnums)
+{
+	switch (myStrgy)
+	{
+	case PMStrainer::allAtOnce:
+		trainAllAtOnce(posnums,negnums);
+		break;
+	case PMStrainer::oneAtOnce:
+		trainOneAtOnce(posnums,negnums);
+		break;
+	default:
+		break;
+	}
+}
+void setDoubleVec(vector<double>& to,vector<double> frm)
+{
+	to.clear();
+	to.insert(to.end(),frm.begin(),frm.end());
+}
+
+void PMStrainer::trainOneAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums)
+{
+	vector<double> weights;
+	weights.resize(pmStrct.weights.size(),0.0);
+	weights[0]=1.0;
+	int bNum(-1);
+	double bScore(-1.0);
+	vector<double> bWeights;
+	bWeights.clear();
+
+	int tnum;
+	double tvalue;
+	for (int i = 1; i < weights.size(); i++)
+	{
+		double prW=weights[i-1];
+		double hBd=pmStrct.weights[i]*largeBand;
+		for(double tw=prW;tw< hBd;tw+=stepWidth)
+		{
+			tnum=DecideBestScore(weights,posnums,negnums,tvalue);
+			if(tnum>bNum)
+			{
+				bNum=tnum;
+				bScore=tvalue;
+				setDoubleVec(bWeights,weights);
+			}
+		}
+	}
+
+	bestNumber=bNum;
+	bestDivScore=bScore;
+	setDoubleVec(bestWeights,bWeights);
+}
+
+bool endWhile(vector<double> jg,vector<double> tojg)
+{
+	assert(jg.size()==tojg.size());
+	for (int i = 0; i < jg.size(); i++)
+	{
+		if(tojg[i]<jg[i])
+			return false;
+	}
+	return true;
+}
+
+
+void nextweights(vector<double> bd,vector<double>& wts,double stw)
+{
+	int idx=wts.size()-1;
+	bool stpPr=false;
+	while(!stpPr)
+	{
+		wts[idx]+=stw;
+		if(wts[idx]<bd[idx])
+		{
+			stpPr=true;
+			if(idx!=(wts.size()-1))
+			{
+				for(int i=idx+1;i<wts.size();i++)
+					wts[i]=wts[idx];							
+			}
+		}
+		else
+		{
+			idx-=1;
+		}
+		if(idx==0)
+		{
+			stpPr=true;
+			break;
+		}
+
+		
+	}
+}
+
+void PMStrainer::trainAllAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums)
+{
+
+	vector<double> weights;
+	weights.resize(pmStrct.weights.size(),1.0);
+	//weights[0]=1.0;
+	int bNum(-1);
+	double bScore(-1.0);
+	vector<double> bWeights;
+	bWeights.clear();
+
+	int tnum;
+	double tvalue;
+
+	vector<double> allBds;
+	allBds.resize(weights.size(),0.0);
+	allBds[0]=0.9;
+
+	for (int i = 1; i < weights.size(); i++)
+	{
+		allBds[i]=pmStrct.weights[i]*largeBand;
+	}
+	while(!endWhile(allBds,weights))
+	{
+		
+		tnum=DecideBestScore(weights,posnums,negnums,tvalue);
+		if(tnum>bNum)
+		{
+			bNum=tnum;
+			bScore=tvalue;
+			setDoubleVec(bWeights,weights);
+		}
+		nextweights(allBds,weights,stepWidth);
+	}
+
+	bestNumber=bNum;
+	bestDivScore=bScore;
+	setDoubleVec(bestWeights,bWeights);
+}
+void PMStrainer::OutTofile()
+{
+	string s=pmStrct.name+"_bestWts.txt";
+	FILE* fp;
+	fp=fopen(s.c_str(),"w");
+	fprintf(fp,"%d %lf\n%d\n",bestNumber,bestDivScore,bestWeights.size());
+	for (int i = 0; i < bestWeights.size(); i++)
+	{
+		fprintf(fp,"%lf\n",bestWeights[i]);
+	}
+	fclose(fp);
+}
+/*
+double prW=weights[i-1];
+		double hBd=pmStrct.weights[i]*largeBand;
+		for(double tw=prW;tw< hBd;tw+=stepWidth)
+		{
+			tnum=DecideBestScore(weights,posnums,negnums,tvalue);
+			if(tnum>bNum)
+			{
+				bNum=tnum;
+				bScore=tvalue;
+				setDoubleVec(bWeights,weights);
+			}
+		}
+
+*/
