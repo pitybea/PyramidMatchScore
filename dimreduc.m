@@ -5,7 +5,7 @@ tobe=load(inp);
 
 x=tobe;
 y=evalin('base','pm');
-
+ %y=load('pcaMatrix.txt');
 
 [m,n]=size(x);
 x_mean=mean(x,2);
