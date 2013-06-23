@@ -28,7 +28,7 @@ def genpos(fl,pos,fea,opos,l1,l2,l3):
         mfea=[]
         for i in range(0,len(pos)):
             if(tst.ptinrec(rc,sz,pos[i])):
-               mps.append(opos[i])
+               mps.append('%d %d'%(pos[i][1]-rc[1],pos[i][0]-rc[0]))
                mfea.append(fea[i])
         
         mfl=open('mytest%s-%d.txt'%(l2,allcount+pti),'w')

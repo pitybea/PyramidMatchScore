@@ -4,14 +4,14 @@
 #include <iostream>
 #include <fstream>
 
-#include "..\..\..\FileIO\FileInOut.h"
+#include "..\..\..\fileIoinclude\FileInOut.h"
 #include <vector>
 #include <string>
 #include <windows.h>
 #include <direct.h>
 using namespace std;
 using namespace cv;
-#define debugMode
+//#define debugMode
 
 class featype
 {
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 	
 			feas.push_back(temfes);
 		}
-		fileIOclass::OutVector(s+".txt",feas);
+		fileIOclass::OutVector(s+"_sift.txt",feas);
 	
 		
 	
