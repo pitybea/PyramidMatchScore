@@ -35,13 +35,13 @@ PMStruc::PMStruc()
 {
 	totalLvls=-1;
 	mymode=PMStruc::unset;
-	name="";
+	//name="";
 }
 PMStruc::PMStruc(PyrMode p,string s)
 {
 	totalLvls=0;
 	mymode=p;
-	name=s;
+	//name=s;
 	/*
 	weights.resize(i,0.0);
 	for(int i=0;i<weights.size();i++)
@@ -313,7 +313,7 @@ void PMStruc::outToAFile(string filename)
 {
 	FILE* fp;
 	fp=fopen(filename.c_str(),"w");
-	fprintf(fp,"%s %d %d\n%d\n",name.c_str(),mymode,totalLvls,pym.size());
+	fprintf(fp,"%d %d\n%d\n",mymode,totalLvls,pym.size());
 	for(int i=0;i<pym.size();i++)
 	{
 		printPyramidLv(pym[i],fp);
@@ -351,7 +351,7 @@ void PMStruc::outToAFile(string filename)
 
 
 	FILE* ft;
-	string wFname=name+"_wgt.txt";
+	string wFname=filename+"_wgt.txt";
 	ft=fopen(wFname.c_str(),"w");
 	fprintf(ft,"%d\n",weights.size());
 	for(int i=0;i<weights.size();i++)
@@ -367,9 +367,8 @@ void PMStruc::loadFromAFile(string filename)
 	fp=fopen(filename.c_str(),"r");
 	char tems[100];
 	int temsz;
-	fscanf(fp,"%s %d %d\n%d\n",&tems,&mymode,&totalLvls,&temsz);
-	string s(tems);
-	name=s;
+	fscanf(fp,"%d %d\n%d\n",&mymode,&totalLvls,&temsz);
+	
 	pym.clear();
 	for (int i = 0; i < temsz; i++)
 	{
@@ -411,7 +410,7 @@ void PMStruc::loadFromAFile(string filename)
 
 	fclose(fp);
 	FILE* ft;
-	string wFname=name+"_wgt.txt";
+	string wFname=filename+"_wgt.txt";
 	ft=fopen(wFname.c_str(),"r");
 	int wSiz;
 	fscanf(ft,"%d\n",&wSiz);
@@ -945,12 +944,13 @@ int PMStrainer::DecideBestScore(vector<double> temWeight,vector<vector<int> > po
 
 
 	
-PMStrainer::PMStrainer(PMStruc pm,TrainStrategy s,double d,double l)
+PMStrainer::PMStrainer(PMStruc pm,TrainStrategy s,double d,double l,string ts)
 {
 	myStrgy=s;
 	pmStrct=pm;
 	stepWidth=d;
 	largeBand=l;
+	name=ts;
 }
 
 void PMStrainer::Train(vector<vector<int> > posnums,vector<vector<int> > negnums)
@@ -1092,7 +1092,7 @@ void PMStrainer::trainAllAtOnce(vector<vector<int> > posnums,vector<vector<int> 
 }
 void PMStrainer::OutTofile()
 {
-	string s=pmStrct.name+"_bestWts.txt";
+	string s=name+"_bestWts.txt";
 	FILE* fp;
 	fp=fopen(s.c_str(),"w");
 	fprintf(fp,"%d %lf\n%d\n",bestNumber,bestDivScore,bestWeights.size());

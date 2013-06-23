@@ -209,7 +209,7 @@ public:
 	PMStruc();
 
 	PyrMode mymode;
-	string name;
+	//string name;
 	int totalLvls;
 	vector<double> weights;
 
@@ -255,9 +255,10 @@ public:
 		oneAtOnce
 
 	};
-	PMStrainer(PMStruc pm,TrainStrategy s,double d,double l);
+	PMStrainer(PMStruc pm,TrainStrategy s,double d,double l,string ts);
 	void Train(vector<vector<int> > posnums,vector<vector<int> > negnums);
 	void OutTofile();
+	string name;
 
 
 

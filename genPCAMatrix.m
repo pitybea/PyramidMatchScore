@@ -3,7 +3,7 @@ allpostiveFeatures=load ('allpostiveFeatures.txt');
 allnegativeFeatures=load ('allnegativeFeatures.txt');
 
 features=[allpostiveFeatures;allnegativeFeatures];
-[y,z,yy]=princomp(features);
+[z,y,yy]=princomp(features','econ');
 y=y(:,1:10);
 
 fea=fopen('pcaMatrixSize.txt','w');

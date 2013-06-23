@@ -132,7 +132,7 @@ int main_()
 	int num;
 	double value;
 	//num=ptem.TestTrain(posnumbers,negnumbers,value);
-	PMStrainer ptrainer(ptem,PMStrainer::allAtOnce,0.01,3.0);
+	PMStrainer ptrainer(ptem,PMStrainer::allAtOnce,0.01,3.0,"pospym");
 
 	ptrainer.Train(posnumbers,negnumbers);
 	ptrainer.OutTofile();
