@@ -46,7 +46,7 @@ def genpos(fl,pos,fea,opos,l1,l2,l3):
     allcount_fl=open('all%s.txt'%(l1),'w')
     allcount_fl.write(str(allcount+pts_num))
     allcount_fl.close();    
-    print 'ok'
+
     
     
 

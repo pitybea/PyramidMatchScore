@@ -35,12 +35,14 @@ PMStruc::PMStruc()
 {
 	totalLvls=-1;
 	mymode=PMStruc::unset;
+	numOfData=0;
 	//name="";
 }
-PMStruc::PMStruc(PyrMode p,string s)
+PMStruc::PMStruc(PyrMode p)
 {
 	totalLvls=0;
 	mymode=p;
+	numOfData=0;
 	//name=s;
 	/*
 	weights.resize(i,0.0);
@@ -104,7 +106,7 @@ int PMStruc::generatePymFromdata(vector<vector<double> > data)
 	}
 }
 
-void PMStruc::valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl)
+void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl)
 {
 	int totl=pow2[levl];
 	minMax.first-=0.001;
@@ -606,7 +608,7 @@ int PMStruc::dataToPymAver(vector<vector<double> > data)
 		{
 			dataToPymLvl(data,i,pym[i],intvDecs[i]);
 		}*/
-
+		numOfData+=data.size();
 	}
 
 	return 0;
@@ -623,7 +625,7 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 
 		bool goGon=false;
 		int goodi=0;
-		while(!goGon&&goodi<6)
+		while(!goGon&&goodi<LevelLimit)
 		{
 			vector<pair<double,double> > aAb;
 			aAb.resize(data[0].size(),pair<double,double>(0.0,0.0));
@@ -641,7 +643,7 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 			goodi+=1;
 			totalLvls+=1;
 		}
-	
+		numOfData+=data.size();
 	
 	}
 	
@@ -1117,3 +1119,226 @@ double prW=weights[i-1];
 		}
 
 */
+
+PMSEnsemble::PMSEnsemble()
+{
+	pyms.clear();
+}
+int PMSEnsemble::generateAaBsFromdata(vector<vector<double> > data)
+{
+	if (data.size()>0)
+	{
+		dimension=data[0].size();
+		vector<pair<double,double> > minmax;
+		minmax.resize(data[0].size(),pair<double,double>(0.0,0.0));
+		dtmMinMx(data,minmax);
+	
+		int goodi=0;
+		while(goodi<LevelLimit)
+		{
+			vector<pair<double,double> > aAb;
+			aAb.resize(data[0].size(),pair<double,double>(0.0,0.0));
+			for (int i=0;i<data[0].size();i++)
+			{
+				valueToInx(minmax[i],aAb[i],goodi);
+			}			
+			aAbs.push_back(aAb);	
+			goodi+=1;
+
+		}
+	
+	
+	}
+	
+	return 0;
+};
+
+int PMStruc::initPymWithABs(vector<vector<pair<double,double> > > abS,int dimension)
+{
+	if (abS.size()>0)
+	{
+
+
+	
+		int haldim=dimension/2;
+
+		aAbs.clear();
+		aAbs.insert(aAbs.end(),abS.begin(),abS.end());
+
+		twoExs.clear();
+		twExMs.clear();
+
+		for (int i = 0; i < aAbs.size(); i++)
+		{
+			map<int,map<int,int> > pymlv;	
+			pym.push_back(pymlv);
+			weights.push_back(pow2[i]);
+			totalLvls+=1;
+
+
+
+			
+			int twExM=pow2[i];
+			vector<int> twoEx;
+			twoEx.resize(dimension,0);
+			for (int ti=0;ti<haldim;ti++)
+			{
+				twoEx[ti]=twoEx[ti+haldim]=pow(pow2[i],ti);
+			}
+			twExMs.push_back(twExM);
+			twoExs.push_back(twoEx);
+		}
+
+		
+
+	
+	
+	}
+	
+	return 0;
+};
+int PMStruc::AddoneData(vector<double> data,bool AddOrMinus)
+{
+
+	
+	int dimension=data.size();
+	int haldim=dimension/2;
+
+	for (int levi = 0; levi < pym.size(); levi++)
+	{
+		int lvel=levi;
+	
+		int fisI(0),secI(0);
+		for (int j=0;j<haldim;j++)
+		{
+			int indtem;
+			indtem=aAbs[levi][j].first*data[j]+aAbs[levi][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[levi]-1))
+			{
+				indtem=twExMs[levi]-1;
+			}
+			fisI+=twoExs[levi][j]*indtem;
+		}
+		for (int j=haldim;j<dimension;j++)
+		{
+			int indtem;
+			indtem=aAbs[levi][j].first*data[j]+aAbs[levi][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[levi]-1))
+			{
+				indtem=twExMs[levi]-1;
+			}
+			secI+=twoExs[levi][j]*indtem;
+		}
+
+		
+		if (pym[levi].count(fisI)>0)
+		{
+			if (pym[levi][fisI].count(secI)>0)
+			{
+				if(AddOrMinus)
+					pym[levi][fisI][secI]+=1;
+				else
+					pym[levi][fisI][secI]-=1;
+				//fineEngough=false;
+				//	cout<<pymlvl[fisI][secI]<<endl;
+			}
+			else
+			{
+				if(AddOrMinus)
+					pym[levi][fisI].insert(pair<int,int>(secI,1));
+				else
+					pym[levi][fisI].insert(pair<int,int>(secI,-1));
+			}
+		}
+		else
+		{
+			map<int,int> temlv;
+			if(AddOrMinus)
+				temlv.insert(pair<int,int>(secI,1));
+			else
+				temlv.insert(pair<int,int>(secI,-1));
+			pym[levi].insert(pair<int,map<int,int> >(fisI,temlv));
+		}
+	}
+	
+
+	numOfData+=1;
+	return 0;
+};
+
+
+
+int PMStruc::AddSeverlData(vector<vector<double> > data,bool AddorMinus)
+{
+	if(data.size()>0)
+		for(auto d :data)
+			AddoneData(d,AddorMinus);
+
+	return 0;
+}
+
+
+int PMSEnsemble::generateStructureFromData(vector<vector<vector<double> > > data)
+{
+
+	if (data.size()>0)
+		for(auto d :data)
+			if(pyms.size()==0)
+			{
+				PMStruc tp(PMStruc::normal);
+				tp.initPymWithABs(aAbs,dimension);
+				tp.AddSeverlData(d,true);
+				pyms.push_back(tp);
+			}
+			else
+			{
+				vector<double> tr;
+				tr.resize(pyms.size(),0.0);
+				for(int i=0;i<tr.size();i++)
+				{
+					vector<int> temiv;
+					tr[i]=pyms[i].givePyramidMatchScore(d,false,temiv);
+					
+				}
+				auto sd=maxminValAndInx(tr,true);
+				if(sd.second>threshold)
+					pyms[sd.first].AddSeverlData(d,true);
+				else
+				{
+					
+					PMStruc tp(PMStruc::normal);
+					tp.initPymWithABs(aAbs,dimension);
+					tp.AddSeverlData(d,true);
+					pyms.push_back(tp);
+				}
+
+
+			}
+
+	
+
+	return 0;
+}
+
+double PMSEnsemble::givePyramidMatchScore(vector<vector<double> > dataset)
+{
+	if(pyms.size()==0)
+		return 0.0;
+	else
+	{
+		vector<double> rslts;
+		rslts.clear();
+		for(auto s:pyms)
+			rslts.push_back(s.givePyramidMatchScore(dataset,false,vector<int>(0,0)));
+
+		return maxminValAndInx(rslts,true).second;
+	}
+}

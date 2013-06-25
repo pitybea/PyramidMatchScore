@@ -54,7 +54,7 @@ void trainPositive()
 	//NormalVec(dats);
 	
 
-	PMStruc pedmd(PMStruc::average,"pospym");
+	PMStruc pedmd(PMStruc::average);
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("pospym.txt");
 }
@@ -82,7 +82,7 @@ void trainNegative()
 	//NormalVec(dats);
 	//fileIOclass::OutVectorSDouble("temp.txt",dats,true);
 
-	PMStruc pedmd(PMStruc::normal,"negpym");
+	PMStruc pedmd(PMStruc::normal);
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("negpym.txt");
 }
@@ -170,7 +170,7 @@ int main__()
 	//NormalVec(dats);
 	fileIOclass::OutVectorSDouble("temp.txt",dats,true);
 
-	PMStruc pedmd(PMStruc::normal,"pym");
+	PMStruc pedmd(PMStruc::normal);
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("firtem.txt");
 

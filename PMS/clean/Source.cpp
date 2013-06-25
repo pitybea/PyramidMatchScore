@@ -10,10 +10,14 @@
 #include "PMS.h"
 #include "../../../fileIoinclude/FileInOut.h"
 
-vector<vector<double> > getAllfeas()
+pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas()
 {
 	vector<vector<double> > rslt;
 	rslt.clear();
+
+	vector<vector<vector<double> > > arst;
+	arst.clear();
+
 	vector<string> flNms;
 	flNms.clear();
 	flNms=fileIOclass::InVectorString("positive.lst");
@@ -25,21 +29,20 @@ vector<vector<double> > getAllfeas()
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 
 		rslt.insert(rslt.end(),tvd.begin(),tvd.end());
+		arst.push_back(tvd);
 	}
 
 
-	return rslt;
+	return pair<vector<vector<double> >,vector<vector<vector<double> > > >(rslt,arst);
 	
 }
 
-int main()
-{
 
-	_chdir("E:\\carData\\TrainImages");
-	PMStruc pedmd(PMStruc::normal,"pospym");
-	pedmd.generatePymFromdata(getAllfeas());
+
+
+void givescores(PMStruc pedmd)
+{
 	
-	_chdir("E:\\carData\\TestImages\\mytest");
 	vector<string> flNms;
 	flNms.clear();
 	flNms=fileIOclass::InVectorString("positive.lst");
@@ -51,6 +54,7 @@ int main()
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 		vector<int> result;
 		printf("%lf\n",pedmd.givePyramidMatchScore(tvd,false,result));
+		
 	}
 
 	flNms.clear();
@@ -63,7 +67,79 @@ int main()
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 		vector<int> result;
 		printf("%lf\n",pedmd.givePyramidMatchScore(tvd,false,result));
+		
 	}
+}
+
+
+void givescores(PMSEnsemble pedmd)
+{
+	
+	vector<string> flNms;
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("positive.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		vector<int> result;
+		printf("%lf\n",pedmd.givePyramidMatchScore(tvd));
+		
+	}
+
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("negative.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		vector<int> result;
+		printf("%lf\n",pedmd.givePyramidMatchScore(tvd));
+		
+	}
+}
+
+int main()
+{
+
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+
+	PMSEnsemble pmse;
+	pmse.threshold=200;
+
+	pmse.generateAaBsFromdata(data);
+	pmse.generateStructureFromData(ad.second);
+
+	PMSEnsemble pem;
+	pem.generateAaBsFromdata(data);
+
+	PMStruc n(PMStruc::normal);
+	n.initPymWithABs(pem.aAbs,data[0].size());
+	for (int i = 0; i < data.size(); i++)
+	{
+		n.AddoneData(data[i],true);
+	}
+
+	PMStruc pedmd(PMStruc::normal);
+	pedmd.generatePymFromdata(data);
+
+
+	
+
+	_chdir("E:\\carData\\TestImages\\mytest");
+	givescores(pedmd);
+	printf("-------------******************-------------**********************\n");
+	givescores(n);
+	printf("-------------******************-------------**********************\n");
+	givescores(pmse);
+
 	getchar();
 
 	//pedmd.outToAFile("pospym.txt");

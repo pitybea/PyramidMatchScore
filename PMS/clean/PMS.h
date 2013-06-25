@@ -1,12 +1,17 @@
-#include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <vector>
 #include <string>
 #include <map>
 #include <math.h>
+#include <assert.h>
 using namespace std;
-using namespace cv;
+
+#define LevelLimit 6
+
+struct Point
+{
+	int x;
+	int y;
+};
 
 template<class T>
 static void prshl(vector<T> p,int n,vector<int>& index)
@@ -93,6 +98,53 @@ vector<vector<T> > TransitMtx(vector<vector<T> > oData,vector<vector<T> >trasM)
 	return tData;
 }
 
+
+template<class T>
+pair<int,T> maxminValAndInx(vector<T> inp,bool maxormin)
+{
+	pair<int,T> rslt;
+	if(inp.size()==0)
+	{
+		rslt.first=-1;
+		return rslt;
+	}
+	else if(inp.size()==1)
+	{
+		rslt.first=0;
+		rslt.second=inp[0];
+		return rslt;
+
+	}
+	else
+	{
+		rslt.first=0;
+		rslt.second=inp[0];
+		for (int i = 1; i < inp.size(); i++)
+		{
+			if(maxormin)
+			{
+				if (inp[i]>rslt.second)
+				{
+					rslt.first=i;
+					rslt.second=inp[i];
+				}
+			}
+			else
+			{
+				if (inp[i]<rslt.second)
+				{
+					rslt.first=i;
+					rslt.second=inp[i];
+				}
+			}
+		}
+
+		return rslt;
+	}
+
+	
+
+}
 
 template<class T>
 int ZeroMnVec(vector<vector<T> >& dataset)
@@ -201,11 +253,13 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 	return result;
 }
 
+
+
 class PMStruc
 {
 public:
 	enum PyrMode{normal,average,unset};
-	PMStruc(PyrMode p,string s);
+	PMStruc(PyrMode p);
 	PMStruc();
 
 	PyrMode mymode;
@@ -213,26 +267,33 @@ public:
 	int totalLvls;
 	vector<double> weights;
 
+	 
 	int generatePymFromdata(vector<vector<double> > data);
 	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 	void outToAFile(string filename);
 	void loadFromAFile(string filename);
 	
-	
-	
+
+friend class PMSEnsemble;
+//protected:
+	int initPymWithABs(vector<vector<pair<double,double> > > abS,int dimension);
+	int AddoneData(vector<double> data,bool AddOrMinus);
+	int AddSeverlData(vector<vector<double> > data,bool AddorMinus);
+
+
 private:
 	int dataToPym(vector<vector<double> > data);
 	int dataToPymAver(vector<vector<double> > data);
 
-	void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
+	//void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
 
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
 
 	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
-	double  MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 
-	int  matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
+	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
 	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
 	
 	
@@ -240,11 +301,38 @@ private:
 	vector<map<int,map<int,int> > > pym;
 	vector<vector<pair<double,double> > > aAbs;
 	vector<vector<vector<double> > > intvDecs;
+
+
 	
+	//int haldim;
+	vector<int> twExMs;//=pow2[i];
+	vector<vector<int>> twoExs;
+
+	int numOfData;
 	
 
 };
 
+class PMSEnsemble
+{
+public:
+	PMSEnsemble();
+	vector<vector<double>> weights;
+	int generateAaBsFromdata(vector<vector<double> > data);
+
+	int generateStructureFromData(vector<vector<vector<double> > > data);
+	double givePyramidMatchScore(vector<vector<double> > dataset);
+	
+	vector<vector<pair<double,double> > > aAbs;
+	double threshold;
+
+
+private:
+
+	vector<PMStruc> pyms;
+	int dimension;
+	
+};
 
 class PMStrainer
 {
