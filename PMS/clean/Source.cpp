@@ -112,10 +112,11 @@ int main()
 	auto data=ad.first;
 
 	PMSEnsemble pmse;
-	pmse.threshold=200;
+	pmse.threshold=15;
 
 	pmse.generateAaBsFromdata(data);
 	pmse.generateStructureFromData(ad.second);
+
 
 	PMSEnsemble pem;
 	pem.generateAaBsFromdata(data);
@@ -138,7 +139,15 @@ int main()
 	printf("-------------******************-------------**********************\n");
 	givescores(n);
 	printf("-------------******************-------------**********************\n");
+
+
 	givescores(pmse);
+	printf("-------------******************-------------**********************\n");
+	printf("%d\n",pmse.pyms.size());
+	for (auto pm: pmse.pyms)
+	{
+		printf("%d\n",pm.getNumofData());
+	}
 
 	getchar();
 

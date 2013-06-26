@@ -1305,7 +1305,7 @@ int PMSEnsemble::generateStructureFromData(vector<vector<vector<double> > > data
 				for(int i=0;i<tr.size();i++)
 				{
 					vector<int> temiv;
-					tr[i]=pyms[i].givePyramidMatchScore(d,false,temiv);
+					tr[i]=pyms[i].givePyramidMatchScore(d,false,temiv)/sqrt((double)pyms[i].numOfData);
 					
 				}
 				auto sd=maxminValAndInx(tr,true);

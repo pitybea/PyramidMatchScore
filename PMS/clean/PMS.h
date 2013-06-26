@@ -279,7 +279,7 @@ friend class PMSEnsemble;
 	int initPymWithABs(vector<vector<pair<double,double> > > abS,int dimension);
 	int AddoneData(vector<double> data,bool AddOrMinus);
 	int AddSeverlData(vector<vector<double> > data,bool AddorMinus);
-
+	int getNumofData(){return numOfData;};
 
 private:
 	int dataToPym(vector<vector<double> > data);
@@ -327,7 +327,7 @@ public:
 	double threshold;
 
 
-private:
+//private:
 
 	vector<PMStruc> pyms;
 	int dimension;
