@@ -5,7 +5,7 @@ tobe=load(inp);
 
 x=tobe;
 y=evalin('base','pm');
-y=y(:,1:10);
+y=y(:,1:100);
  %y=load('pcaMatrix.txt');
 
 [m,n]=size(x);

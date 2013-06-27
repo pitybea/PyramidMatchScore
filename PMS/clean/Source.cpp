@@ -103,7 +103,69 @@ void givescores(PMSEnsemble pedmd)
 	}
 }
 
-int main()
+int main ()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+
+
+	PMSEnsemble pem;
+	pem.generateAaBsFromdata(data);
+
+	PMStruc n(PMStruc::normal);
+	n.initPymWithABs(pem.aAbs,data[0].size());
+
+
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+	printf("-------------******************-------------**********************\n");
+	for (int i = 0; i < 100; i++)
+	{
+		n.AddSeverlData(ad.second[i],true);
+	}
+	givescores(n);
+
+	for (int i =100; i < 200; i++)
+	{
+		n.AddSeverlData(ad.second[i],true);
+	}
+	printf("-------------******************-------------**********************\n");
+	givescores(n);
+
+
+
+	for (int i =200; i < 300; i++)
+	{
+		n.AddSeverlData(ad.second[i],true);
+	}
+	printf("-------------******************-------------**********************\n");
+	givescores(n);
+
+
+	
+	for (int i =300; i < 400; i++)
+	{
+		n.AddSeverlData(ad.second[i],true);
+	}
+	printf("-------------******************-------------**********************\n");
+	givescores(n);
+
+
+	
+	for (int i =400; i < ad.second.size(); i++)
+	{
+		n.AddSeverlData(ad.second[i],true);
+	}
+	printf("-------------******************-------------**********************\n");
+	givescores(n);
+
+
+
+	return 0;
+}
+int main_ok()
 {
 
 	_chdir("E:\\carData\\TrainImages");
@@ -116,6 +178,9 @@ int main()
 
 	pmse.generateAaBsFromdata(data);
 	pmse.generateStructureFromData(ad.second);
+
+	
+
 
 	/*
 	PMSEnsemble pem;
