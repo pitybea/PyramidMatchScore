@@ -40,6 +40,37 @@ pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas()
 
 
 
+void givescores(PMStruc pedmd,int dim)
+{
+	
+	vector<string> flNms;
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("positive.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		vector<int> result;
+		printf("%lf\n",pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),false,result));
+		
+	}
+
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("negative.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		vector<int> result;
+		printf("%lf\n",pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),false,result));
+		
+	}
+}
+
 void givescores(PMStruc pedmd)
 {
 	
@@ -103,7 +134,85 @@ void givescores(PMSEnsemble pedmd)
 	}
 }
 
-int main ()
+void testDimension(pair<vector<vector<double> >,vector<vector<vector<double> > > > ad,int dim)
+{
+		auto data=ad.first;
+		PMStruc pedmd(PMStruc::normal);
+		printf("-------------******************-----(%d)--------**********************\n",dim);
+		pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
+		givescores(pedmd,dim);
+}
+
+int main1()
+{
+	vector<vector<int> > tst;
+	vector<int> ok;
+	ok.resize(10,0);
+	for (int i = 0; i < 10; i++)
+	{
+		ok[i]=i;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		tst.push_back(ok);
+	}
+
+	for(auto ss:tst)
+	{
+		for(auto s:ss)
+			printf("%d ",s);
+		printf("\n");
+	}
+	for(auto ss:selectVecButLstTwo(tst,3))
+	{
+		for(auto s:ss)
+			printf("%d ",s);
+		printf("\n");
+	}
+
+	getchar();
+
+	return 0;
+}
+
+int main()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+	int dim=10;
+	PMStruc pedmd(PMStruc::inverse);
+	printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
+	givescores(pedmd,dim);
+
+	return 0;
+}
+int maintestdim()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+	testDimension(ad,1);
+
+	testDimension(ad,3);
+
+	testDimension(ad,7);
+	testDimension(ad,10);
+	testDimension(ad,15);
+	testDimension(ad,20);
+	testDimension(ad,30);
+
+}
+int main_0()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
@@ -187,7 +296,7 @@ int main_ok()
 	pem.generateAaBsFromdata(data);
 
 
-
+	auto data=ad.first;
 	PMStruc pedmd(PMStruc::normal);
 	pedmd.generatePymFromdata(data);
 

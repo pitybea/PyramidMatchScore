@@ -79,10 +79,13 @@ double PMStruc::givePyramidMatchScore(vector<vector<double> > dataset,bool Exclu
 	switch (mymode)
 	{
 	case PMStruc::normal:
-		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel);
+		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,false);
 		break;
 	case PMStruc::average:
 		return MatchDttoPymAv(dataset,ExcluMode,scoreAllLevel);
+		break;
+	case PMStruc::inverse:
+		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,false);
 		break;
 	default:
 		return 0.0;
@@ -796,7 +799,7 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 	return res;
 }
 
-double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers)
+double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse)
 {
 	//vector<int> mnumbers;
 	mnumbers.resize(pym.size(),0);
@@ -813,10 +816,22 @@ double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vect
 	double reslt(0.0);
 	for (int i=0;i<pym.size();i++)
 	{
-		reslt+=mnumbers[i]*weights[i]*dataset[0].size();
+		if(!inverse)
+			reslt+=mnumbers[i]*weights[i]*dataset[0].size();
+		else
+			reslt+=mnumbers[i]*(1.0/weights[i])*dataset[0].size();
+	}
+	if(inverse)
+	{
+		reslt/=dataset.size();
+		reslt=1.0/reslt;
 	}
 	return reslt;
 }
+
+
+
+
 
 
 

@@ -14,6 +14,45 @@ struct Point
 };
 
 template<class T>
+vector<vector<T> > selectVecButLstTwo(vector<vector<T> > inp,int dim)
+{
+	
+	vector<vector<T> > rslt;
+	rslt.clear();
+
+	if(inp.size()>0)
+	{
+		int myd=inp[0].size();
+		for (auto ss:inp)
+		{
+			 ss.erase(ss.begin()+dim, ss.begin()+myd-2 );
+			rslt.push_back(ss );
+		}
+	}
+	return rslt;
+}
+
+template<class T>
+vector<vector<T> > selectVec(vector<vector<T> > inp,int dim)
+{
+	
+	vector<vector<T> > rslt;
+	rslt.clear();
+
+	if(inp.size()>0)
+	{
+		int myd=inp[0].size();
+		for (auto ss:inp)
+		{
+			 ss.erase(ss.begin()+dim, ss.begin()+myd );
+			rslt.push_back(ss );
+		}
+	}
+	return rslt;
+}
+
+
+template<class T>
 static void prshl(vector<T> p,int n,vector<int>& index)
 {
 	int k,j,i;
@@ -258,7 +297,7 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 class PMStruc
 {
 public:
-	enum PyrMode{normal,average,unset};
+	enum PyrMode{normal,average,unset,inverse};
 	PMStruc(PyrMode p);
 	PMStruc();
 
@@ -290,7 +329,7 @@ private:
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
 
-	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel,bool inverse);
 	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 
 	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
