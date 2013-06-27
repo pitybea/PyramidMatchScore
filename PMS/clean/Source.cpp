@@ -117,30 +117,57 @@ int main()
 	pmse.generateAaBsFromdata(data);
 	pmse.generateStructureFromData(ad.second);
 
-
+	/*
 	PMSEnsemble pem;
 	pem.generateAaBsFromdata(data);
 
-	PMStruc n(PMStruc::normal);
-	n.initPymWithABs(pem.aAbs,data[0].size());
-	for (int i = 0; i < data.size(); i++)
-	{
-		n.AddoneData(data[i],true);
-	}
+
 
 	PMStruc pedmd(PMStruc::normal);
 	pedmd.generatePymFromdata(data);
 
 
-	
+		
 
 	_chdir("E:\\carData\\TestImages\\mytest");
 	givescores(pedmd);
-	printf("-------------******************-------------**********************\n");
-	givescores(n);
+
 	printf("-------------******************-------------**********************\n");
 
 
+	
+	*/
+
+	_chdir("E:\\carData\\TestImages\\mytest");
+	givescores(pmse);
+	printf("-------------******************-------------**********************\n");
+	printf("%d\n",pmse.pyms.size());
+	for (auto pm: pmse.pyms)
+	{
+		printf("%d\n",pm.getNumofData());
+	}
+
+	printf("-------------******************-------------**********************\n");
+
+		pmse.threshold=40;
+
+	pmse.pyms.clear();
+	pmse.generateStructureFromData(ad.second);
+	givescores(pmse);
+	printf("-------------******************-------------**********************\n");
+	printf("%d\n",pmse.pyms.size());
+	for (auto pm: pmse.pyms)
+	{
+		printf("%d\n",pm.getNumofData());
+	}
+
+
+	printf("-------------******************-------------**********************\n");
+
+			pmse.threshold=100;
+
+	pmse.pyms.clear();
+	pmse.generateStructureFromData(ad.second);
 	givescores(pmse);
 	printf("-------------******************-------------**********************\n");
 	printf("%d\n",pmse.pyms.size());
