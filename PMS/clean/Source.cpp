@@ -176,7 +176,7 @@ int main1()
 	return 0;
 }
 
-int main()
+int main_0_()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
@@ -213,7 +213,7 @@ int maintestdim()
 
 	return 0;
 }
-int main_0()
+int main()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
