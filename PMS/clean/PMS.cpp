@@ -85,7 +85,7 @@ double PMStruc::givePyramidMatchScore(vector<vector<double> > dataset,bool Exclu
 		return MatchDttoPymAv(dataset,ExcluMode,scoreAllLevel);
 		break;
 	case PMStruc::inverse:
-		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,false);
+		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,true);
 		break;
 	default:
 		return 0.0;
@@ -102,6 +102,9 @@ int PMStruc::generatePymFromdata(vector<vector<double> > data)
 		break;
 	case PMStruc::average:
 		return dataToPymAver(data);
+		break;
+	case PMStruc::inverse:
+		return dataToPym(data);
 		break;
 	default:
 		return 0;
@@ -821,11 +824,14 @@ double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vect
 		else
 			reslt+=mnumbers[i]*(1.0/weights[i])*dataset[0].size();
 	}
+	reslt/=dataset.size();
 	if(inverse)
 	{
-		reslt/=dataset.size();
+		
 		reslt=1.0/reslt;
 	}
+
+		
 	return reslt;
 }
 

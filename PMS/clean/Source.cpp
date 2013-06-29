@@ -186,7 +186,7 @@ int main()
 	_chdir("E:\\carData\\TestImages\\mytest");
 
 	int dim=10;
-	PMStruc pedmd(PMStruc::inverse);
+	PMStruc pedmd(PMStruc::normal);
 	printf("-------------******************-----(%d)--------**********************\n",dim);
 	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
 	givescores(pedmd,dim);
@@ -211,6 +211,7 @@ int maintestdim()
 	testDimension(ad,20);
 	testDimension(ad,30);
 
+	return 0;
 }
 int main_0()
 {
