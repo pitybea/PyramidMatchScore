@@ -297,7 +297,7 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 class PMStruc
 {
 public:
-	enum PyrMode{normal,average,unset,inverse};
+	enum PyrMode{normal,average,unset,inverse,postitionSpecific};
 	PMStruc(PyrMode p);
 	PMStruc();
 
@@ -308,36 +308,48 @@ public:
 
 	 
 	int generatePymFromdata(vector<vector<double> > data);
+
+	//int generatePosPymsFromdata(vector<vector<double> > data);
+
 	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 	void outToAFile(string filename);
 	void loadFromAFile(string filename);
 	
 
-friend class PMSEnsemble;
-//protected:
+	
 	int initPymWithABs(vector<vector<pair<double,double> > > abS,int dimension);
 	int AddoneData(vector<double> data,bool AddOrMinus);
 	int AddSeverlData(vector<vector<double> > data,bool AddorMinus);
 	int getNumofData(){return numOfData;};
 
+
+
 private:
 	int dataToPym(vector<vector<double> > data);
 	int dataToPymAver(vector<vector<double> > data);
+	int dataToPosPyms(vector<vector<double> > data);
 
 	//void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
 
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
+	bool dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,map<int,map<int,int> >& pymlvl);
+
 
 	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel,bool inverse);
 	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse);
+
 
 	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
 	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
-	
+	int matchDToOnePosLv(vector<vector<double> > dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
 	
 
 	vector<map<int,map<int,int> > > pym;
+
+	vector<vector<map<int,map<int,int> > > > pospyms;
+
 	vector<vector<pair<double,double> > > aAbs;
 	vector<vector<vector<double> > > intvDecs;
 

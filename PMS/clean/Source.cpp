@@ -38,6 +38,66 @@ pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas()
 }
 
 
+pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas(int dim)
+{
+	vector<vector<double> > rslt;
+	rslt.clear();
+
+	vector<vector<vector<double> > > arst;
+	arst.clear();
+
+	vector<string> flNms;
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("positive.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+
+		auto tvm=selectVecButLstTwo(tvd,dim);
+
+		rslt.insert(rslt.end(),tvm.begin(),tvm.end());
+		arst.push_back(tvm);
+	}
+
+
+	return pair<vector<vector<double> >,vector<vector<vector<double> > > >(rslt,arst);
+	
+}
+
+
+void givescoresAnother(PMStruc pedmd,int dim)
+{
+	
+	vector<string> flNms;
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("positive.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		vector<int> result;
+		printf("%lf\n",pedmd.givePyramidMatchScore(selectVec( tvd,dim),false,result));
+		
+	}
+
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("negative.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		vector<int> result;
+		printf("%lf\n",pedmd.givePyramidMatchScore(selectVec( tvd,dim),false,result));
+		
+	}
+}
 
 
 void givescores(PMStruc pedmd,int dim)
@@ -71,7 +131,7 @@ void givescores(PMStruc pedmd,int dim)
 	}
 }
 
-void givescores(PMStruc pedmd)
+void givescores(PMSEnsemble pedmd,int dim)
 {
 	
 	vector<string> flNms;
@@ -84,7 +144,7 @@ void givescores(PMStruc pedmd)
 		tvd.clear();
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(tvd,false,result));
+		printf("%lf\n",pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim)));
 		
 	}
 
@@ -97,42 +157,11 @@ void givescores(PMStruc pedmd)
 		tvd.clear();
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(tvd,false,result));
+		printf("%lf\n",pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim)));
 		
 	}
 }
 
-
-void givescores(PMSEnsemble pedmd)
-{
-	
-	vector<string> flNms;
-	flNms.clear();
-	flNms=fileIOclass::InVectorString("positive.lst");
-	
-	for(auto s : flNms)
-	{
-		vector<vector<double> > tvd;
-		tvd.clear();
-		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
-		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(tvd));
-		
-	}
-
-	flNms.clear();
-	flNms=fileIOclass::InVectorString("negative.lst");
-	
-	for(auto s : flNms)
-	{
-		vector<vector<double> > tvd;
-		tvd.clear();
-		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
-		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(tvd));
-		
-	}
-}
 
 void testDimension(pair<vector<vector<double> >,vector<vector<vector<double> > > > ad,int dim)
 {
@@ -176,24 +205,7 @@ int main1()
 	return 0;
 }
 
-int main_0_()
-{
-	_chdir("E:\\carData\\TrainImages");
-	
-	auto ad=getAllfeas();
-	auto data=ad.first;
-	
-	_chdir("E:\\carData\\TestImages\\mytest");
-
-	int dim=10;
-	PMStruc pedmd(PMStruc::normal);
-	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
-	givescores(pedmd,dim);
-
-	return 0;
-}
-int maintestdim()
+int test_dimension_bynumber()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
@@ -213,12 +225,12 @@ int maintestdim()
 
 	return 0;
 }
-int main()
+int test_example_num()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
 	auto ad=getAllfeas();
-	auto data=ad.first;
+	auto data=selectVecButLstTwo(ad.first,10);
 
 
 	PMSEnsemble pem;
@@ -230,128 +242,109 @@ int main()
 
 	_chdir("E:\\carData\\TestImages\\mytest");
 
+	int dim=10;
+
 	printf("-------------******************-------------**********************\n");
 	for (int i = 0; i < 100; i++)
 	{
-		n.AddSeverlData(ad.second[i],true);
+		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
-	givescores(n);
+	givescores(n,dim);
 
 	for (int i =100; i < 200; i++)
 	{
-		n.AddSeverlData(ad.second[i],true);
+		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n);
+	givescores(n,dim);
 
 
 
 	for (int i =200; i < 300; i++)
 	{
-		n.AddSeverlData(ad.second[i],true);
+		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n);
+	givescores(n,dim);
 
 
 	
 	for (int i =300; i < 400; i++)
 	{
-		n.AddSeverlData(ad.second[i],true);
+		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n);
+	givescores(n,dim);
 
 
 	
 	for (int i =400; i < ad.second.size(); i++)
 	{
-		n.AddSeverlData(ad.second[i],true);
+		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n);
+	givescores(n,dim);
 
 
 
 	return 0;
 }
-int main_ok()
+int test_ensemble_bynumber()
 {
 
 	_chdir("E:\\carData\\TrainImages");
 	
-	auto ad=getAllfeas();
+	int dim=10;
+	auto ad=getAllfeas(dim);
 	auto data=ad.first;
 
 	PMSEnsemble pmse;
-	pmse.threshold=15;
+	pmse.threshold=2.5;
 
 	pmse.generateAaBsFromdata(data);
 	pmse.generateStructureFromData(ad.second);
 
 	
 
-
-	/*
-	PMSEnsemble pem;
-	pem.generateAaBsFromdata(data);
-
-
-	auto data=ad.first;
-	PMStruc pedmd(PMStruc::normal);
-	pedmd.generatePymFromdata(data);
-
-
-		
-
 	_chdir("E:\\carData\\TestImages\\mytest");
-	givescores(pedmd);
+	givescores(pmse,dim);
+	printf("-------------******************-------------**********************\n");
+	printf("%d\n",pmse.pyms.size());
+	for (auto pm: pmse.pyms)
+	{
+		printf("%d\n",pm.getNumofData());
+	}
 
 	printf("-------------******************-------------**********************\n");
 
+		pmse.threshold=0.4;
+
+	pmse.pyms.clear();
+	pmse.generateStructureFromData(ad.second);
+	givescores(pmse,dim);
+	printf("-------------******************-------------**********************\n");
+	printf("%d\n",pmse.pyms.size());
+	for (auto pm: pmse.pyms)
+	{
+		printf("%d\n",pm.getNumofData());
+	}
+
+
+	printf("-------------******************-------------**********************\n");
+
+			pmse.threshold=0.3;
+
+	pmse.pyms.clear();
+	pmse.generateStructureFromData(ad.second);
+	givescores(pmse,dim);
+	printf("-------------******************-------------**********************\n");
+	printf("%d\n",pmse.pyms.size());
+	for (auto pm: pmse.pyms)
+	{
+		printf("%d\n",pm.getNumofData());
+	}
 
 	
-	*/
-
-	_chdir("E:\\carData\\TestImages\\mytest");
-	givescores(pmse);
-	printf("-------------******************-------------**********************\n");
-	printf("%d\n",pmse.pyms.size());
-	for (auto pm: pmse.pyms)
-	{
-		printf("%d\n",pm.getNumofData());
-	}
-
-	printf("-------------******************-------------**********************\n");
-
-		pmse.threshold=40;
-
-	pmse.pyms.clear();
-	pmse.generateStructureFromData(ad.second);
-	givescores(pmse);
-	printf("-------------******************-------------**********************\n");
-	printf("%d\n",pmse.pyms.size());
-	for (auto pm: pmse.pyms)
-	{
-		printf("%d\n",pm.getNumofData());
-	}
-
-
-	printf("-------------******************-------------**********************\n");
-
-			pmse.threshold=100;
-
-	pmse.pyms.clear();
-	pmse.generateStructureFromData(ad.second);
-	givescores(pmse);
-	printf("-------------******************-------------**********************\n");
-	printf("%d\n",pmse.pyms.size());
-	for (auto pm: pmse.pyms)
-	{
-		printf("%d\n",pm.getNumofData());
-	}
-
-	getchar();
 
 	//pedmd.outToAFile("pospym.txt");
 
@@ -359,5 +352,71 @@ int main_ok()
 	//PMStruc ptem;
 	//ptem.loadFromAFile("pospym.txt");
 
+	return 0;
+}
+
+
+
+int test_basic()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+	int dim=10;
+
+	PMStruc pedmd(PMStruc::normal);
+	printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
+	givescores(pedmd,dim);
+
+	return 0;
+}
+
+
+int no_pos()
+{
+	
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+	int dim=10;
+
+	PMStruc pedmd(PMStruc::normal);
+	printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(selectVec(data,dim));
+	givescoresAnother(pedmd,dim);
+
+	return 0;
+}
+
+int testposspe()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	auto ad=getAllfeas();
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+	int dim=10;
+
+	PMStruc pedmd(PMStruc::postitionSpecific);
+	printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
+	givescores(pedmd,dim);
+
+	return 0;
+}
+int main()
+{
+	testposspe();
 	return 0;
 }
