@@ -390,9 +390,60 @@ int no_pos()
 	int dim=10;
 
 	PMStruc pedmd(PMStruc::normal);
-	printf("-------------******************-----(%d)--------**********************\n",dim);
+
 	pedmd.generatePymFromdata(selectVec(data,dim));
-	givescoresAnother(pedmd,dim);
+	givescoresAnother (pedmd,dim);
+	
+	return 0;
+}
+
+int genpostraining()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	int dim=10;
+	auto ad=getAllfeas(dim);
+	auto data=ad.first;
+	
+	PMStruc pedmd(PMStruc::postitionSpecific);
+	//printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(data);
+	vector<string> flNms;
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("positive.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		double siz=(double)tvd.size();
+		vector<int> result;
+		pedmd.givePyramidMatchScore(selectVec( tvd,dim),true,result);
+		for(auto ss:result)
+			printf("%lf ",(double)ss/siz);
+		printf("\n");
+		
+	}
+
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("negative.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		double siz=(double)tvd.size();
+		vector<int> result;
+		pedmd.givePyramidMatchScore(selectVec( tvd,dim),false,result);
+		for(auto ss:result)
+			printf("%lf ",(double)ss/siz);
+		printf("\n");
+		
+	}
+
+
 
 	return 0;
 }
@@ -409,7 +460,7 @@ int testposspe()
 	int dim=10;
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
-	printf("-------------******************-----(%d)--------**********************\n",dim);
+//	printf("-------------******************-----(%d)--------**********************\n",dim);
 	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
 	givescores(pedmd,dim);
 
@@ -417,6 +468,6 @@ int testposspe()
 }
 int main()
 {
-	testposspe();
+	genpostraining();
 	return 0;
 }
