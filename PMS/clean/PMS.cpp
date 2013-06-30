@@ -31,18 +31,14 @@ static float pow2[]=
 
 };
 
-PMStruc::PMStruc()
-{
-	totalLvls=-1;
-	mymode=PMStruc::unset;
-	numOfData=0;
-	//name="";
-}
+
 PMStruc::PMStruc(PyrMode p)
 {
 	totalLvls=0;
 	mymode=p;
 	numOfData=0;
+
+	
 	//name=s;
 	/*
 	weights.resize(i,0.0);
@@ -88,7 +84,7 @@ double PMStruc::givePyramidMatchScore(vector<vector<double> > dataset,bool Exclu
 		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,true);
 		break;
 	case PMStruc::postitionSpecific:
-		return MatchPosDttoPym(dataset,ExcluMode,scoreAllLevel,false);
+		return MatchPosDttoPym(dataset,ExcluMode,scoreAllLevel,false,posorder);
 		break;
 	default:
 		return 0.0;
@@ -807,7 +803,7 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 	
 	return 0;
 }
-int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs,bool ExcluMode )
+int PMStruc:: matchDToOneLv(vector<vector<double> > &dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs,bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
 	int dimension=dataset[0].size();
@@ -821,7 +817,9 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 	}
 
 	int res(0);
-	for (int i=0;i<dataset.size();i++)
+
+	int siz=dataset.size();
+	for (int i=siz-1;i>=0;i--)
 	{
 		int fisI(0),secI(0);
 		for (int j=0;j<haldim;j++)
@@ -865,6 +863,7 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 					{
 						res+=1;
 						pmlv[fisI][secI]-=1;
+						dataset.erase(dataset.begin()+i);
 					}
 				}
 				else
@@ -873,6 +872,7 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 					{
 						res+=1;
 						pmlv[fisI][secI]-=1;
+						dataset.erase(dataset.begin()+i);
 					}
 				}
 
@@ -881,14 +881,14 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 	}
 	return res;
 }
-int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode )
+int PMStruc:: matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
 	int dimension=dataset[0].size();
 
-
+	int siz=dataset.size();
 	int res(0);
-	for (int i=0;i<dataset.size();i++)
+	for (int i=siz-1;i>=0;i--)
 	{
 		int fisI(0),secI(0);
 		for (int j=0;j<haldim;j++)
@@ -931,6 +931,7 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 					{
 						res+=1;
 						pmlv[fisI][secI]-=1;
+						dataset.erase(dataset.begin()+i);
 					}
 				}
 				else 
@@ -939,6 +940,7 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 						{
 							res+=1;
 							pmlv[fisI][secI]-=1;
+							dataset.erase(dataset.begin()+i);
 						}
 				}
 			}
@@ -948,14 +950,15 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map
 }
 
 
-int PMStruc:: matchDToOnePosLv(vector<vector<double> > dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode )
+int PMStruc:: matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
 	int dimension=dataset[0].size();
 
 
 	int res(0);
-	for (int i=0;i<dataset.size();i++)
+	int siz=dataset.size();
+	for (int i=siz-1;i>=0;i--)
 	{
 		int fisI(0),secI(0);
 		for (int j=0;j<haldim;j++)
@@ -1011,6 +1014,7 @@ int PMStruc:: matchDToOnePosLv(vector<vector<double> > dataset,int alevl,int ple
 					{
 						res+=1;
 						pmlv[fisI][secI]-=1;
+						dataset.erase(dataset.begin()+i);
 					}
 				}
 				else 
@@ -1019,6 +1023,7 @@ int PMStruc:: matchDToOnePosLv(vector<vector<double> > dataset,int alevl,int ple
 						{
 							res+=1;
 							pmlv[fisI][secI]-=1;
+							dataset.erase(dataset.begin()+i);
 						}
 				}
 			}
@@ -1030,26 +1035,27 @@ int PMStruc:: matchDToOnePosLv(vector<vector<double> > dataset,int alevl,int ple
 double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse)
 {
 	//vector<int> mnumbers;
+
+	int siz=dataset.size();
+
+	int dim=dataset[0].size();
 	mnumbers.resize(pym.size(),0);
-	for (int i=0;i<mnumbers.size();i++)
+	for (int i=mnumbers.size()-1;i>=0;i--)
 	{
 		mnumbers[i]=matchDToOneLv(dataset,i,pym[i],aAbs[i],ExcluMode);
 	}
-	for (int i=0;i<mnumbers.size()-1;i++)
-	{
-		mnumbers[i]=mnumbers[i]-mnumbers[i+1];
-	}
+	
 	//vector<double> weights;
 	//weights.resize(pym.size(),0.0);
 	double reslt(0.0);
 	for (int i=0;i<pym.size();i++)
 	{
 		if(!inverse)
-			reslt+=mnumbers[i]*weights[i]*dataset[0].size();
+			reslt+=mnumbers[i]*weights[i]*dim;
 		else
-			reslt+=mnumbers[i]*(1.0/weights[i])*dataset[0].size();
+			reslt+=mnumbers[i]*(1.0/weights[i])*dim;
 	}
-	reslt/=dataset.size();
+	reslt/=siz;
 	if(inverse)
 	{
 		
@@ -1060,39 +1066,33 @@ double PMStruc::MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vect
 	return reslt;
 }
 
-double PMStruc::MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse)
+double PMStruc::MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse,int order[LevelLimit*LevelLimit][2])
 {
 	//vector<int> mnumbers;
+	mnumbers.resize(LevelLimit*LevelLimit,0);
+	int dim=dataset[0].size();
+	int siz=dataset.size();
+
 	double reslt(0.0);
-	for (int pmi = 0; pmi < pospyms.size(); pmi++)
+	for (int wi = 0; wi < LevelLimit*LevelLimit; wi++)
 	{
-		mnumbers.resize(pospyms[pmi].size(),0);
-
-
-
-		for (int i=0;i<mnumbers.size();i++)
-		{
-			mnumbers[i]=matchDToOnePosLv(dataset,i,pmi,pospyms[pmi][i],ExcluMode);
-		}
-		for (int i=0;i<mnumbers.size()-1;i++)
-		{
-			mnumbers[i]=mnumbers[i]-mnumbers[i+1];
-		}
-		//vector<double> weights;
-		//weights.resize(pym.size(),0.0);
-		
-		for (int i=0;i<mnumbers.size();i++)
-		{
-			if(!inverse)
-				reslt+=mnumbers[i]*weights[pmi*LevelLimit+ i]*dataset[0].size();
-			else
-				reslt+=mnumbers[i]*(1.0/weights[pmi*LevelLimit+ i ])*dataset[0].size();
-		}
+		int pi=order[wi][1];
+		int ai=order[wi][0];
+		mnumbers[wi]=matchDToOnePosLv(dataset,ai,pi,pospyms[pi][ai],ExcluMode);
+		if(!inverse)
+			reslt+=mnumbers[wi]*weights[pi*LevelLimit+ ai]*dim;
+		else
+			reslt+=mnumbers[wi]*(1.0/weights[pi*LevelLimit+ ai ])*dim;
+	
 		
 
 	}
+		
+		
+
 	
-	reslt/=dataset.size();
+	
+	reslt/=siz;
 	if(inverse)
 	{
 		

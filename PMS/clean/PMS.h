@@ -292,14 +292,62 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 	return result;
 }
 
+static int posorder[36][2]=
+	{
+	5,5,
 
+	4,5,
+	5,4,
+
+	5,3,
+	4,4,
+	3,5,
+
+	2,5,
+	3,4,
+	4,3,
+	5,2,
+
+	5,1,
+	4,2,
+	3,3,
+	2,4,
+	1,5,
+
+	0,5,
+	1,4,
+	2,3,
+	3,2,
+	4,1,
+	5,0,
+
+	4,0,
+	3,1,
+	2,2,
+	1,3,
+	0,4,
+
+	0,3,
+	1,2,
+	2,1,
+	3,0,
+
+	2,0,
+	1,1,
+	0,2,
+
+	0,1,
+	1,0,
+
+	0,0
+	};
 
 class PMStruc
 {
 public:
-	enum PyrMode{normal,average,unset,inverse,postitionSpecific};
+	enum PyrMode{normal,average,inverse,postitionSpecific};
 	PMStruc(PyrMode p);
-	PMStruc();
+	PMStruc(){};
 
 	PyrMode mymode;
 	//string name;
@@ -338,12 +386,12 @@ private:
 
 	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel,bool inverse);
 	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
-	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse);
+	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse,int order[LevelLimit*LevelLimit][2]);
 
 
-	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
-	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
-	int matchDToOnePosLv(vector<vector<double> > dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
+	int matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
+	int matchDToOneLv(vector<vector<double> > & dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
+	int matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
 	
 
 	vector<map<int,map<int,int> > > pym;
@@ -353,7 +401,7 @@ private:
 	vector<vector<pair<double,double> > > aAbs;
 	vector<vector<vector<double> > > intvDecs;
 
-
+	//static int posSpcOrder[36][2](posorder);
 	
 	//int haldim;
 	vector<int> twExMs;//=pow2[i];
