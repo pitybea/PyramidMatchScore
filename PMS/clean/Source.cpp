@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <direct.h>
 #include "PMS.h"
+#include "adaboost.h"
 #include "../../../fileIoinclude/FileInOut.h"
 
 pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas()
@@ -67,69 +68,59 @@ pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas(int d
 	
 }
 
-
-void givescoresAnother(PMStruc pedmd,int dim)
+void givescoreshelp(PMStruc pedmd,int dim,string s,bool ada,bool another,adaboost machine)
 {
-	
 	vector<string> flNms;
 	flNms.clear();
-	flNms=fileIOclass::InVectorString("positive.lst");
-	
+	flNms=fileIOclass::InVectorString(s.c_str());
 	for(auto s : flNms)
 	{
 		vector<vector<double> > tvd;
-		tvd.clear();
-		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
-		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(selectVec( tvd,dim),false,result));
 		
-	}
-
-	flNms.clear();
-	flNms=fileIOclass::InVectorString("negative.lst");
-	
-	for(auto s : flNms)
-	{
-		vector<vector<double> > tvd;
 		tvd.clear();
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		double siz=(double)tvd.size();
 		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(selectVec( tvd,dim),false,result));
+		double score;
+		if(!another)
+			score=pedmd.givePyramidMatchScore(selectVecButLstTwo ( tvd,dim),false,result);
+		else
+			score=pedmd.givePyramidMatchScore(selectVec ( tvd,dim),false,result);
+		if(ada)
+		{
+			vector<double> to;
+			to.resize(result.size(),0.0);
+			for (int i = 0; i < result.size(); i++)
+			{
+				to[i]=(double)result[i]/siz;
+				printf("%lf ",to[i]);
+			}
+			printf("%lf\n",machine.classfy(to));
+		}
+		else
+			printf("%lf\n",score);
 		
 	}
 }
 
-
-void givescores(PMStruc pedmd,int dim)
+void givescores(PMStruc pedmd,int dim,bool ada,bool another)
 {
 	
-	vector<string> flNms;
-	flNms.clear();
-	flNms=fileIOclass::InVectorString("positive.lst");
 	
-	for(auto s : flNms)
-	{
-		vector<vector<double> > tvd;
-		tvd.clear();
-		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
-		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),false,result));
-		
-	}
+	
+	adaboost machine;
 
-	flNms.clear();
-	flNms=fileIOclass::InVectorString("negative.lst");
+	FILE* fp=fopen("adabMach.txt","r");
+	machine.loadFromfile(fp);
+	fclose(fp);
+	givescoreshelp(pedmd,dim,"positive.lst",ada,another,machine);
+	givescoreshelp(pedmd,dim,"negative.lst",ada,another,machine);
 	
-	for(auto s : flNms)
-	{
-		vector<vector<double> > tvd;
-		tvd.clear();
-		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
-		vector<int> result;
-		printf("%lf\n",pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),false,result));
-		
-	}
+
+	
 }
+
+
 
 void givescores(PMSEnsemble pedmd,int dim)
 {
@@ -169,7 +160,7 @@ void testDimension(pair<vector<vector<double> >,vector<vector<vector<double> > >
 		PMStruc pedmd(PMStruc::normal);
 		printf("-------------******************-----(%d)--------**********************\n",dim);
 		pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
-		givescores(pedmd,dim);
+		givescores(pedmd,dim,false,false);
 }
 
 int main1()
@@ -249,14 +240,14 @@ int test_example_num()
 	{
 		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
-	givescores(n,dim);
+	givescores(n,dim,false,false);
 
 	for (int i =100; i < 200; i++)
 	{
 		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n,dim);
+	givescores(n,dim,false,false);
 
 
 
@@ -265,7 +256,7 @@ int test_example_num()
 		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n,dim);
+	givescores(n,dim,false,false);
 
 
 	
@@ -274,7 +265,7 @@ int test_example_num()
 		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n,dim);
+	givescores(n,dim,false,false);
 
 
 	
@@ -283,7 +274,7 @@ int test_example_num()
 		n.AddSeverlData(selectVecButLstTwo(ad.second[i],dim),true);
 	}
 	printf("-------------******************-------------**********************\n");
-	givescores(n,dim);
+	givescores(n,dim,false,false);
 
 
 
@@ -371,7 +362,7 @@ int test_basic()
 	PMStruc pedmd(PMStruc::normal);
 	printf("-------------******************-----(%d)--------**********************\n",dim);
 	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
-	givescores(pedmd,dim);
+	givescores(pedmd,dim,true,false);
 
 	return 0;
 }
@@ -392,7 +383,7 @@ int no_pos()
 	PMStruc pedmd(PMStruc::normal);
 
 	pedmd.generatePymFromdata(selectVec(data,dim));
-	givescoresAnother (pedmd,dim);
+	givescores(pedmd,dim,false,true);
 	
 	return 0;
 }
@@ -419,7 +410,7 @@ int genpostraining()
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 		double siz=(double)tvd.size();
 		vector<int> result;
-		pedmd.givePyramidMatchScore(selectVec( tvd,dim),true,result);
+		pedmd.givePyramidMatchScore(selectVecButLstTwo ( tvd,dim),true,result);
 		for(auto ss:result)
 			printf("%lf ",(double)ss/siz);
 		printf("\n");
@@ -436,7 +427,59 @@ int genpostraining()
 		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
 		double siz=(double)tvd.size();
 		vector<int> result;
-		pedmd.givePyramidMatchScore(selectVec( tvd,dim),false,result);
+		pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),false,result);
+		for(auto ss:result)
+			printf("%lf ",(double)ss/siz);
+		printf("\n");
+		
+	}
+
+
+
+	return 0;
+}
+
+
+int gentraining()
+{
+	_chdir("E:\\carData\\TrainImages");
+	
+	int dim=10;
+	auto ad=getAllfeas(dim);
+	auto data=ad.first;
+	
+	PMStruc pedmd(PMStruc::normal);
+	//printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(data);
+	vector<string> flNms;
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("positive.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		double siz=(double)tvd.size();
+		vector<int> result;
+		pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),true,result);
+		for(auto ss:result)
+			printf("%lf ",(double)ss/siz);
+		printf("\n");
+		
+	}
+
+	flNms.clear();
+	flNms=fileIOclass::InVectorString("negative.lst");
+	
+	for(auto s : flNms)
+	{
+		vector<vector<double> > tvd;
+		tvd.clear();
+		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
+		double siz=(double)tvd.size();
+		vector<int> result;
+		pedmd.givePyramidMatchScore(selectVecButLstTwo( tvd,dim),false,result);
 		for(auto ss:result)
 			printf("%lf ",(double)ss/siz);
 		printf("\n");
@@ -462,12 +505,12 @@ int testposspe()
 	PMStruc pedmd(PMStruc::postitionSpecific);
 //	printf("-------------******************-----(%d)--------**********************\n",dim);
 	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
-	givescores(pedmd,dim);
+	givescores(pedmd,dim,false,false);
 
 	return 0;
 }
 int main()
 {
-	genpostraining();
+	test_basic();
 	return 0;
 }
