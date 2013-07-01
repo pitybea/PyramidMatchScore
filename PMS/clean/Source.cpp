@@ -11,32 +11,7 @@
 #include "adaboost.h"
 #include "../../../fileIoinclude/FileInOut.h"
 
-pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas()
-{
-	vector<vector<double> > rslt;
-	rslt.clear();
 
-	vector<vector<vector<double> > > arst;
-	arst.clear();
-
-	vector<string> flNms;
-	flNms.clear();
-	flNms=fileIOclass::InVectorString("positive.lst");
-	
-	for(auto s : flNms)
-	{
-		vector<vector<double> > tvd;
-		tvd.clear();
-		tvd=fileIOclass::InVectorSDouble(s+"_ptscpp.txt");
-
-		rslt.insert(rslt.end(),tvd.begin(),tvd.end());
-		arst.push_back(tvd);
-	}
-
-
-	return pair<vector<vector<double> >,vector<vector<vector<double> > > >(rslt,arst);
-	
-}
 
 
 pair<vector<vector<double> >,vector<vector<vector<double> > > > getAllfeas(int dim)
@@ -110,9 +85,9 @@ void givescores(PMStruc pedmd,int dim,bool ada,bool another)
 	
 	adaboost machine;
 
-	FILE* fp=fopen("adabMach.txt","r");
-	machine.loadFromfile(fp);
-	fclose(fp);
+//	FILE* fp=fopen("adabMach.txt","r");
+//	machine.loadFromfile(fp);
+//	fclose(fp);
 	givescoreshelp(pedmd,dim,"positive.lst",ada,another,machine);
 	givescoreshelp(pedmd,dim,"negative.lst",ada,another,machine);
 	
@@ -200,7 +175,7 @@ int test_dimension_bynumber()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
-	auto ad=getAllfeas();
+	auto ad=getAllfeas(32);
 	auto data=ad.first;
 	
 	_chdir("E:\\carData\\TestImages\\mytest");
@@ -220,8 +195,8 @@ int test_example_num()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
-	auto ad=getAllfeas();
-	auto data=selectVecButLstTwo(ad.first,10);
+	auto ad=getAllfeas(10);
+	auto data=ad.first;
 
 
 	PMSEnsemble pem;
@@ -352,17 +327,18 @@ int test_basic()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
-	auto ad=getAllfeas();
+	int dim=10;
+	auto ad=getAllfeas(dim);
 	auto data=ad.first;
 	
 	_chdir("E:\\carData\\TestImages\\mytest");
 
-	int dim=10;
+	
 
 	PMStruc pedmd(PMStruc::normal);
 	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
-	givescores(pedmd,dim,true,false);
+	pedmd.generatePymFromdata(data);
+	givescores(pedmd,dim,false,false);
 
 	return 0;
 }
@@ -373,12 +349,13 @@ int no_pos()
 	
 	_chdir("E:\\carData\\TrainImages");
 	
-	auto ad=getAllfeas();
+		int dim=10;
+	auto ad=getAllfeas(dim);
 	auto data=ad.first;
 	
 	_chdir("E:\\carData\\TestImages\\mytest");
 
-	int dim=10;
+
 
 	PMStruc pedmd(PMStruc::normal);
 
@@ -495,22 +472,23 @@ int testposspe()
 {
 	_chdir("E:\\carData\\TrainImages");
 	
-	auto ad=getAllfeas();
+		int dim=10;
+	auto ad=getAllfeas(dim);
 	auto data=ad.first;
 	
 	_chdir("E:\\carData\\TestImages\\mytest");
 
-	int dim=10;
+
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
 //	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
+	pedmd.generatePymFromdata(data);
 	givescores(pedmd,dim,false,false);
 
 	return 0;
 }
 int main()
 {
-	test_basic();
+	testposspe();
 	return 0;
 }

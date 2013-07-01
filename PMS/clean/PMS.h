@@ -345,13 +345,13 @@ static int posorder[36][2]=
 class PMStruc
 {
 public:
-	enum PyrMode{normal,average,inverse,postitionSpecific};
+	enum PyrMode{normal,/*average,*/inverse,postitionSpecific};
 	PMStruc(PyrMode p);
 	PMStruc(){};
 
 	PyrMode mymode;
 	//string name;
-	int totalLvls;
+
 	vector<double> weights;
 
 	 
@@ -374,32 +374,35 @@ public:
 
 private:
 	int dataToPym(vector<vector<double> > data);
-	int dataToPymAver(vector<vector<double> > data);
+//	int dataToPymAver(vector<vector<double> > data);
 	int dataToPosPyms(vector<vector<double> > data);
 
 	//void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
 
-	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB);
-	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
+	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl);
+//	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
 	bool dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,map<int,map<int,int> >& pymlvl);
 
 
 	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel,bool inverse);
-	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+//	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
 	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse,int order[LevelLimit*LevelLimit][2]);
 
 
 	int matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
-	int matchDToOneLv(vector<vector<double> > & dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
+//	int matchDToOneLv(vector<vector<double> > & dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
 	int matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
 	
 
+	pair<int,int> dataToTwoIndx(int,vector<double>);
+	pair<int,int> dataToTwoPosInx(int alvel,int plvel,vector<double> data);
+
 	vector<map<int,map<int,int> > > pym;
 
-	vector<vector<map<int,map<int,int> > > > pospyms;
+	//vector<vector<map<int,map<int,int> > > > pospyms;
 
 	vector<vector<pair<double,double> > > aAbs;
-	vector<vector<vector<double> > > intvDecs;
+//	vector<vector<vector<double> > > intvDecs;
 
 	//static int posSpcOrder[36][2](posorder);
 	

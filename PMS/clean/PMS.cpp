@@ -34,7 +34,7 @@ static float pow2[]=
 
 PMStruc::PMStruc(PyrMode p)
 {
-	totalLvls=0;
+
 	mymode=p;
 	numOfData=0;
 
@@ -70,6 +70,8 @@ void dtmMinMx(vector<vector<T> > data,vector<pair<T,T> >& minmaxs)
 	}
 	
 }
+
+
 double PMStruc::givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel)
 {
 	switch (mymode)
@@ -77,9 +79,9 @@ double PMStruc::givePyramidMatchScore(vector<vector<double> > dataset,bool Exclu
 	case PMStruc::normal:
 		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,false);
 		break;
-	case PMStruc::average:
+/*	case PMStruc::average:
 		return MatchDttoPymAv(dataset,ExcluMode,scoreAllLevel);
-		break;
+		break;*/
 	case PMStruc::inverse:
 		return MatchDttoPym(dataset,ExcluMode,scoreAllLevel,true);
 		break;
@@ -99,9 +101,9 @@ int PMStruc::generatePymFromdata(vector<vector<double> > data)
 	case PMStruc::normal:
 		return dataToPym(data);
 		break;
-	case PMStruc::average:
+/*	case PMStruc::average:
 		return dataToPymAver(data);
-		break;
+		break;*/
 	case PMStruc::inverse:
 		return dataToPym(data);
 		break;
@@ -112,6 +114,99 @@ int PMStruc::generatePymFromdata(vector<vector<double> > data)
 		return 0;
 		break;
 	}
+}
+
+
+pair<int,int> PMStruc::dataToTwoPosInx(int alvel,int plvel,vector<double> data)
+{
+	int dimension=data.size();
+	int haldim=dimension/2;
+
+	int fisI(0),secI(0);
+	for (int j=0;j<haldim;j++)
+		{
+			int indtem;
+			indtem=aAbs[alvel][j].first*data[j]+aAbs[alvel][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[alvel]-1))
+			{
+				indtem=twExMs[alvel]-1;
+			}
+			fisI+=twoExs[alvel][j]*indtem;
+		}
+		for (int j=haldim;j<dimension-2;j++)
+		{
+			int indtem;
+			indtem=aAbs[alvel][j].first*data[j]+aAbs[alvel][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[alvel]-1))
+			{
+				indtem=twExMs[alvel]-1;
+			}
+			secI+=twoExs[alvel][j]*indtem;
+		}
+		for (int j = dimension-2; j < dimension; j++)
+		{
+			int indtem;
+			indtem=aAbs[plvel][j].first*data[j]+aAbs[plvel][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[plvel]-1))
+			{
+				indtem=twExMs[plvel]-1;
+			}
+			secI+=twoExs[max(plvel,alvel)][j]*indtem;
+		}
+
+		return pair<int,int>(fisI,secI);
+}
+
+
+pair<int,int> PMStruc::dataToTwoIndx(int lvel,vector<double> data)
+{
+
+		int dimension=data.size();
+		int haldim=dimension/2;
+
+		int fisI(0),secI(0);
+		for (int j=0;j<haldim;j++)
+		{
+			int indtem;
+			indtem=aAbs[lvel][j].first*data[j]+aAbs[lvel][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[lvel]-1))
+			{
+				indtem=twExMs[lvel]-1;
+			}
+			fisI+=twoExs[lvel][j]*indtem;
+		}
+		for (int j=haldim;j<dimension;j++)
+		{
+			int indtem;
+			indtem=aAbs[lvel][j].first*data[j]+aAbs[lvel][j].second;
+			if (indtem<0)
+			{
+				indtem=0;
+			}
+			if (indtem>(twExMs[lvel]-1))
+			{
+				indtem=twExMs[lvel]-1;
+			}
+			secI+=twoExs[lvel][j]*indtem;
+		}
+
+		return pair<int,int> (fisI,secI);
 }
 
 void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl)
@@ -132,49 +227,10 @@ bool PMStruc::dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,
 
 	for (int i=0;i<datas.size();i++)
 	{
-		int fisI(0),secI(0);
-		for (int j=0;j<haldim;j++)
-		{
-			int indtem;
-			indtem=aAbs[alvel][j].first*datas[i][j]+aAbs[alvel][j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExMs[alvel]-1))
-			{
-				indtem=twExMs[alvel]-1;
-			}
-			fisI+=twoExs[alvel][j]*indtem;
-		}
-		for (int j=haldim;j<dimension-2;j++)
-		{
-			int indtem;
-			indtem=aAbs[alvel][j].first*datas[i][j]+aAbs[alvel][j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExMs[alvel]-1))
-			{
-				indtem=twExMs[alvel]-1;
-			}
-			secI+=twoExs[alvel][j]*indtem;
-		}
-		for (int j = dimension-2; j < dimension; j++)
-		{
-			int indtem;
-			indtem=aAbs[plvel][j].first*datas[i][j]+aAbs[plvel][j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExMs[plvel]-1))
-			{
-				indtem=twExMs[plvel]-1;
-			}
-			secI+=twoExs[max(plvel,alvel)][j]*indtem;
-		}
+
+		auto ss=dataToTwoPosInx(alvel,plvel,datas[i]);
+		int fisI(ss.first),secI(ss.second);
+		
 		if (pymlvl.count(fisI)>0)
 		{
 			if (pymlvl[fisI].count(secI)>0)
@@ -198,58 +254,26 @@ bool PMStruc::dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,
 	return false;
 }
 
-bool PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<pair<double,double> > aAndB)
+bool PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl)
 {
 	bool fineEngough=true;
 	int dimension=datas[0].size();
 	
 	int haldim=datas[0].size()/2;
-	int twExM=pow2[lvel];
 
-	vector<int> twoEx;
-	twoEx.resize(dimension,0);
-	for (int i=0;i<haldim;i++)
-	{
-		twoEx[i]=twoEx[i+haldim]=pow(pow2[lvel],i);
-	}
+
 	for (int i=0;i<datas.size();i++)
 	{
-		int fisI(0),secI(0);
-		for (int j=0;j<haldim;j++)
-		{
-			int indtem;
-			indtem=aAndB[j].first*datas[i][j]+aAndB[j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExM-1))
-			{
-				indtem=twExM-1;
-			}
-			fisI+=twoEx[j]*indtem;
-		}
-		for (int j=haldim;j<dimension;j++)
-		{
-			int indtem;
-			indtem=aAndB[j].first*datas[i][j]+aAndB[j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExM-1))
-			{
-				indtem=twExM-1;
-			}
-			secI+=twoEx[j]*indtem;
-		}
+
+		auto ss=dataToTwoIndx(lvel,datas[i]);
+		int fisI(ss.first),secI(ss.second);
+
 		if (pymlvl.count(fisI)>0)
 		{
 			if (pymlvl[fisI].count(secI)>0)
 			{
 				pymlvl[fisI][secI]+=1;
 				fineEngough=false;
-				//	cout<<pymlvl[fisI][secI]<<endl;
 			}
 			else
 			{
@@ -398,7 +422,7 @@ void PMStruc::outToAFile(string filename)
 {
 	FILE* fp;
 	fp=fopen(filename.c_str(),"w");
-	fprintf(fp,"%d %d\n%d\n",mymode,totalLvls,pym.size());
+	fprintf(fp,"%d\n%d\n",mymode,pym.size());
 	for(int i=0;i<pym.size();i++)
 	{
 		printPyramidLv(pym[i],fp);
@@ -415,14 +439,14 @@ void PMStruc::outToAFile(string filename)
 			fprintf(fp,"\n");
 		}
 		break;
-	case PMStruc::average:
+/*	case PMStruc::average:
 		fprintf(fp,"%d\n",intvDecs.size());
 		for (int i = 0; i < intvDecs.size(); i++)
 		{
 			printintvDecs(intvDecs[i],fp);
 		}
 
-		break;
+		break;*/
 	default:
 		break;
 	}
@@ -452,7 +476,7 @@ void PMStruc::loadFromAFile(string filename)
 	fp=fopen(filename.c_str(),"r");
 	char tems[100];
 	int temsz;
-	fscanf(fp,"%d %d\n%d\n",&mymode,&totalLvls,&temsz);
+	fscanf(fp,"%d\n%d\n",&mymode,&temsz);
 	
 	pym.clear();
 	for (int i = 0; i < temsz; i++)
@@ -477,7 +501,7 @@ void PMStruc::loadFromAFile(string filename)
 			fscanf(fp,"\n");
 		}
 		break;
-	case PMStruc::average:
+	/*case PMStruc::average:
 		int ivDS;
 		fscanf(fp,"%d\n",&ivDS);
 		for (int i = 0; i < ivDS; i++)
@@ -488,7 +512,7 @@ void PMStruc::loadFromAFile(string filename)
 		
 		}
 
-		break;
+		break;*/
 	default:
 		break;
 	}
@@ -508,7 +532,7 @@ void PMStruc::loadFromAFile(string filename)
 
 
 }
-
+/*
 bool PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl)
 {
 	bool fineEngough=true;
@@ -578,7 +602,7 @@ bool PMStruc::dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<in
 
 	}
 	return fineEngough;
-}
+}*/
 
 void dtinterv(vector<vector<double> > dataset,vector<double> & intvDec,int i,int goodi)
 {
@@ -644,6 +668,7 @@ int initintvs(vector<vector<vector<double> > > &intvDecs,vector<vector<double> >
 	return 0;
 }
 
+/*
 int PMStruc::dataToPymAver(vector<vector<double> > data)
 {
 	if (data.size()>0)
@@ -676,7 +701,7 @@ int PMStruc::dataToPymAver(vector<vector<double> > data)
 			totalLvls+=1;
 		}
 
-		/*
+		//comment
 		intvDecs.resize(totalLvls,vector<vector<double> >(dimension,tvd));
 		
 		initintvs(intvDecs,data);
@@ -690,12 +715,14 @@ int PMStruc::dataToPymAver(vector<vector<double> > data)
 		for (int i=0;i<totalLvls;i++)
 		{
 			dataToPymLvl(data,i,pym[i],intvDecs[i]);
-		}*/
+		}//comment
 		numOfData+=data.size();
 	}
 
 	return 0;
 }
+*/
+
 
 int PMStruc::dataToPosPyms(vector<vector<double> > data)
 {
@@ -729,20 +756,23 @@ int PMStruc::dataToPosPyms(vector<vector<double> > data)
 			twExMs.push_back(twExM);
 			twoExs.push_back(twoEx);
 		}
-		pospyms.clear();
+
+
+//		pospyms.clear();
 		weights.resize(LevelLimit*LevelLimit,0.0);
+		
 		for (int i = 0; i < LevelLimit; i++)
 		{
-			vector<map<int,map<int,int> > > tempym;
+//			vector<map<int,map<int,int> > > tempym;
 			for (int j = 0; j < LevelLimit; j++)
 			{
 				map<int,map<int,int> > pymlv;
 				dataToPosPymLvl(data,j,i,pymlv);
-				tempym.push_back(pymlv);
-
+	//			tempym.push_back(pymlv);
+				pym.push_back(pymlv);
 				weights[LevelLimit*i+j]=sqrt((double)(pow2[i]*pow2[j]));
 			}
-			pospyms.push_back(tempym);
+//		pospyms.push_back(tempym);
 
 		}
 
@@ -764,8 +794,8 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 
 	
 		int haldim=dimension/2;
-		int goodi=0;
-		while(goodi<LevelLimit)
+		
+		for (int goodi = 0; goodi < LevelLimit; goodi++)
 		{
 			int twExM=pow2[goodi];
 			vector<int> twoEx;
@@ -774,7 +804,9 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 			{
 				twoEx[ti]=twoEx[ti+haldim]=pow(pow2[goodi],ti);
 			}
+			
 			twExMs.push_back(twExM);
+
 			twoExs.push_back(twoEx);
 
 			vector<pair<double,double> > aAb;
@@ -784,25 +816,27 @@ int PMStruc::dataToPym(vector<vector<double> > data)
 			{
 				valueToInx(minmax[i],aAb[i],goodi);
 			}
-			map<int,map<int,int> > pymlv;
-			dataToPymLvl(data,goodi,pymlv,aAb);
-			pym.push_back(pymlv);
 
 			aAbs.push_back(aAb);
 			weights.push_back(pow2[goodi]);
-			goodi+=1;
-			totalLvls+=1;
-
-
-			
+	
 
 		}
+		for (int goodi = 0; goodi < LevelLimit; goodi++)
+		{
+			map<int,map<int,int> > pymlv;
+			dataToPymLvl(data,goodi,pymlv);
+			pym.push_back(pymlv);
+		}
+
 		numOfData+=data.size();
 	
 	}
 	
 	return 0;
 }
+
+/*
 int PMStruc:: matchDToOneLv(vector<vector<double> > &dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs,bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
@@ -881,6 +915,8 @@ int PMStruc:: matchDToOneLv(vector<vector<double> > &dataset,int levl,map<int,ma
 	}
 	return res;
 }
+
+*/
 int PMStruc:: matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode )
 {
 	int haldim=dataset[0].size()/2;
@@ -890,36 +926,9 @@ int PMStruc:: matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,ma
 	int res(0);
 	for (int i=siz-1;i>=0;i--)
 	{
-		int fisI(0),secI(0);
-		for (int j=0;j<haldim;j++)
-		{
-			int indtem;
-			indtem=aAndB[j].first*dataset[i][j]+aAndB[j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>( twExMs[levl]-1))
-			{
-				indtem=twExMs[levl]-1;
-			}
-			fisI+=twoExs[levl][j]*indtem;
-		}
-		for (int j=haldim;j<dimension;j++)
-		{
-			int indtem;
-			indtem=aAndB[j].first*dataset[i][j]+aAndB[j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExMs[levl]-1))
-			{
-				indtem=twExMs[levl]-1;
-			}
-			secI+=twoExs[levl][j]*indtem;
-		}
-
+		
+		auto ss=dataToTwoIndx(levl,dataset[i]);
+		int fisI(ss.first),secI(ss.second);
 
 		if (pmlv.count(fisI)>0)
 		{
@@ -960,49 +969,9 @@ int PMStruc:: matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int pl
 	int siz=dataset.size();
 	for (int i=siz-1;i>=0;i--)
 	{
+		auto ss=dataToTwoPosInx(alevl,plevl,dataset[i]);
 		int fisI(0),secI(0);
-		for (int j=0;j<haldim;j++)
-		{
-			int indtem;
-			indtem=aAbs[alevl][j].first*dataset[i][j]+aAbs[alevl][j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>( twExMs[alevl]-1))
-			{
-				indtem=twExMs[alevl]-1;
-			}
-			fisI+=twoExs[alevl][j]*indtem;
-		}
-		for (int j=haldim;j<dimension-1;j++)
-		{
-			int indtem;
-			indtem=aAbs[alevl][j].first*dataset[i][j]+aAbs[alevl][j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExMs[alevl]-1))
-			{
-				indtem=twExMs[alevl]-1;
-			}
-			secI+=twoExs[alevl][j]*indtem;
-		}
-		for (int j = dimension-2; j < dimension; j++)
-		{
-			int indtem;
-			indtem=aAbs[plevl][j].first*dataset[i][j]+aAbs[plevl][j].second;
-			if (indtem<0)
-			{
-				indtem=0;
-			}
-			if (indtem>(twExMs[plevl]-1))
-			{
-				indtem=twExMs[plevl]-1;
-			}
-			secI+=twoExs[max(plevl,alevl)][j]*indtem;
-		}
+		
 
 		if (pmlv.count(fisI)>0)
 		{
@@ -1078,7 +1047,7 @@ double PMStruc::MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,v
 	{
 		int pi=order[wi][1];
 		int ai=order[wi][0];
-		mnumbers[wi]=matchDToOnePosLv(dataset,ai,pi,pospyms[pi][ai],ExcluMode);
+		mnumbers[wi]=matchDToOnePosLv(dataset,ai,pi,pym[pi*LevelLimit+ai],ExcluMode);
 		if(!inverse)
 			reslt+=mnumbers[wi]*weights[pi*LevelLimit+ ai]*dim;
 		else
@@ -1105,7 +1074,7 @@ double PMStruc::MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,v
 
 
 
-
+/*
 
 double PMStruc::MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers)
 {
@@ -1128,6 +1097,7 @@ double PMStruc::MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,ve
 	}
 	return reslt;
 }
+*/
 
 double multiIVecDvec(vector<int> ivec,vector<double> dvec)
 {
@@ -1258,6 +1228,7 @@ void PMStrainer::Train(vector<vector<int> > posnums,vector<vector<int> > negnums
 		break;
 	}
 }
+
 void setDoubleVec(vector<double>& to,vector<double> frm)
 {
 	to.clear();
@@ -1378,6 +1349,7 @@ void PMStrainer::trainAllAtOnce(vector<vector<int> > posnums,vector<vector<int> 
 	bestDivScore=bScore;
 	setDoubleVec(bestWeights,bWeights);
 }
+
 void PMStrainer::OutTofile()
 {
 	string s=name+"_bestWts.txt";
@@ -1410,6 +1382,7 @@ PMSEnsemble::PMSEnsemble()
 {
 	pyms.clear();
 }
+
 int PMSEnsemble::generateAaBsFromdata(vector<vector<double> > data)
 {
 	if (data.size()>0)
@@ -1459,7 +1432,7 @@ int PMStruc::initPymWithABs(vector<vector<pair<double,double> > > abS,int dimens
 			map<int,map<int,int> > pymlv;	
 			pym.push_back(pymlv);
 			weights.push_back(pow2[i]);
-			totalLvls+=1;
+//			totalLvls+=1;
 
 
 

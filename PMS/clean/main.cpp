@@ -29,7 +29,7 @@ static vector<int> oneNumber(string s,PMStruc ptem,vector<vector<double> > TrmTx
 
 	return result;
 }
-
+/*
 void trainPositive()
 {
 	vector<featype> allfeas;
@@ -57,7 +57,7 @@ void trainPositive()
 	PMStruc pedmd(PMStruc::average);
 	pedmd.generatePymFromdata(dats);
 	pedmd.outToAFile("pospym.txt");
-}
+}*/
 void trainNegative()
 {
 	vector<featype> allfeas;
@@ -119,7 +119,7 @@ int main_()
 {
 	_chdir("E:\\uiucCars\\CarData\\TrainImages");
 
-	trainPositive();
+//	trainPositive();
 
 	vector<vector<int> > posnumbers;
 	vector<vector<int> > negnumbers;
