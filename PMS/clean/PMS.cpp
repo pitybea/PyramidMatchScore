@@ -693,7 +693,17 @@ int PMStruc::dataToPymAver(vector<vector<double> > data)
 */
 
 
+int PMStruc::GeneratePosWeightWithParameter(double ratio)
+{
+	for (int i = 0; i < LevelLimit*LevelLimit; i++)
+	{
+		int pi(i/LevelLimit);int ai(i%LevelLimit);
+		weights[i]= pow((double)pow2[pi],ratio)*pow( pow2[ai],1-ratio);
 
+	}
+
+	return 0;
+}
 
 int PMStruc::dataToPym(vector<vector<double> > data)
 {
@@ -949,13 +959,10 @@ double PMStruc::MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,v
 			reslt+=mnumbers[wi]*weights[pi*LevelLimit+ ai]*dim;
 		else
 			reslt+=mnumbers[wi]*(1.0/weights[pi*LevelLimit+ ai ])*dim;
-	
-		
+			
 
 	}
 		
-		
-
 	
 	
 	reslt/=siz;

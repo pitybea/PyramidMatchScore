@@ -5,9 +5,8 @@ import glob
 def printAndEx(s):
     print s
     os.system(s)
-def deployTest():
     
-    
+def initInx():
     cmd='del all*tive.txt'
     printAndEx(cmd)
     
@@ -16,10 +15,19 @@ def deployTest():
     fl.close()
     fl=open('allnegative.txt','wb')
     fl.write('0')
-    fl.close()
+    fl.close()    
+def deployTest():
+    
+    
+    initInx()
     
     cmd="C:\\Python27\\python.exe runforlist.py genSingle test.lst"
     printAndEx(cmd)
+    
+    initInx()
+        
+    cmd="C:\\Python27\\python.exe runforlist.py cropImage test.lst"
+    printAndEx(cmd)    
     
     cmd="del mytest\\*  /s /f  /q"
     printAndEx(cmd)    

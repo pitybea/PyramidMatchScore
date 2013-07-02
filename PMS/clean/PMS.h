@@ -369,7 +369,7 @@ public:
 	int AddoneData(vector<double> data,bool AddOrMinus);
 	int AddSeverlData(vector<vector<double> > data,bool AddorMinus);
 	int getNumofData(){return numOfData;};
-
+	int GeneratePosWeightWithParameter(double ratio);
 
 
 private:

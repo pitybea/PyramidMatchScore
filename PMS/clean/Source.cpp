@@ -74,13 +74,14 @@ void givescoreshelp(PMStruc pedmd,int dim,string s,bool ada,bool another,adaboos
 		}
 		else
 		{
+			/*
 			vector<double> to;
 			to.resize(result.size(),0.0);
 			for (int i = 0; i < result.size(); i++)
 			{
 				to[i]=(double)result[i]/siz;
 				printf("%lf ",to[i]);
-			}
+			}*/
 			printf("%lf\n",score);
 		}
 	}
@@ -515,8 +516,65 @@ int testposspe()
 
 	return 0;
 }
+
+int testposspe(PMStruc pedmd,int dim,double ratio)
+{
+	pedmd.GeneratePosWeightWithParameter(ratio);
+	givescores(pedmd,dim,false,false);
+
+	return 0;
+}
+
+int testPosWeight()
+{
+
+	_chdir("E:\\carData\\TrainImages");
+	
+		int dim=10;
+	auto ad=getAllfeas(dim);
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+
+
+	PMStruc pedmd(PMStruc::postitionSpecific);
+	pedmd.generatePymFromdata(data);
+
+
+	double ra=0.5;
+	
+	for (int i = 0; i < 19; i++)
+	{
+		ra=0.05*(i+1);
+		printf("-------------******************-----(%lf)--------**********************\n",ra);
+
+		testposspe(pedmd,dim,ra);
+	}
+	
+	return 0;
+}
+
 int main()
 {
-	no_app();
+	_chdir("E:\\carData\\TrainImages");
+	
+		int dim=10;
+	auto ad=getAllfeas(dim);
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+
+
+	PMStruc pedmd(PMStruc::postitionSpecific);
+	pedmd.generatePymFromdata(data);
+
+
+	double ra=0.0;
+	printf("-------------******************-----(%lf)--------**********************\n",ra);
+
+	testposspe(pedmd,dim,ra);
+
 	return 0;
 }
