@@ -22,7 +22,7 @@ vector<vector<T> > selectVecButLstTwo(vector<vector<T> > inp,int dim)
 
 	if(inp.size()>0)
 	{
-		int myd=inp[0].size();
+		auto myd=inp[0].size();
 		for (auto ss:inp)
 		{
 			 ss.erase(ss.begin()+dim, ss.begin()+myd-2 );
@@ -41,7 +41,7 @@ vector<vector<T> > selectVec(vector<vector<T> > inp,int dim)
 
 	if(inp.size()>0)
 	{
-		int myd=inp[0].size();
+		auto myd=inp[0].size();
 		for (auto ss:inp)
 		{
 			 ss.erase(ss.begin()+dim, ss.begin()+myd );
@@ -375,13 +375,13 @@ public:
 private:
 	int dataToPym(vector<vector<double> > data);
 //	int dataToPymAver(vector<vector<double> > data);
-	int dataToPosPyms(vector<vector<double> > data);
+//	int dataToPosPyms(vector<vector<double> > data);
 
 	//void valueToInx(pair<double,double> minMax,pair<double,double>& aAndB,int levl);
 
 	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl);
 //	bool dataToPymLvl(vector<vector<double> > datas,int lvel,map<int,map<int,int> >& pymlvl,vector<vector<double> > aintvl);
-	bool dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,map<int,map<int,int> >& pymlvl);
+//	bool dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,map<int,map<int,int> >& pymlvl);
 
 
 	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel,bool inverse);
@@ -389,9 +389,9 @@ private:
 	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse,int order[LevelLimit*LevelLimit][2]);
 
 
-	int matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv,vector<pair<double,double> > aAndB, bool ExcluMode );
+	int matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv, bool ExcluMode );
 //	int matchDToOneLv(vector<vector<double> > & dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
-	int matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
+//	int matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
 	
 
 	pair<int,int> dataToTwoIndx(int,vector<double>);

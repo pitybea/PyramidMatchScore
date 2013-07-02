@@ -73,8 +73,16 @@ void givescoreshelp(PMStruc pedmd,int dim,string s,bool ada,bool another,adaboos
 			printf("%lf\n",machine.classfy(to));
 		}
 		else
+		{
+			vector<double> to;
+			to.resize(result.size(),0.0);
+			for (int i = 0; i < result.size(); i++)
+			{
+				to[i]=(double)result[i]/siz;
+				printf("%lf ",to[i]);
+			}
 			printf("%lf\n",score);
-		
+		}
 	}
 }
 
@@ -343,6 +351,26 @@ int test_basic()
 	return 0;
 }
 
+int no_app()
+{
+	
+	_chdir("E:\\carData\\TrainImages");
+	
+		int dim=0;
+	auto ad=getAllfeas(dim);
+	auto data=ad.first;
+	
+	_chdir("E:\\carData\\TestImages\\mytest");
+
+
+
+	PMStruc pedmd(PMStruc::normal);
+
+	pedmd.generatePymFromdata(data);
+	givescores(pedmd,dim,false,false);
+	
+	return 0;
+}
 
 int no_pos()
 {
@@ -489,6 +517,6 @@ int testposspe()
 }
 int main()
 {
-	testposspe();
+	no_app();
 	return 0;
 }
