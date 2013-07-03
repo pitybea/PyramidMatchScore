@@ -436,6 +436,7 @@ public:
 	
 };
 
+/*
 class PMStrainer
 {
 public:
@@ -465,6 +466,33 @@ private:
 	void trainAllAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums);
 	int DecideBestScore(vector<double> temWeight,vector<vector<int> > posnums,vector<vector<int> > negnums,double& divValue);
 };
+*/
+
+class trainVecs
+{
+public:
+	enum strategies{allAtOnce,oneAtonce};
+
+	trainVecs(strategies strg,vector<vector<double> > lhbds,vector<double> stps,vector<vector<double> > pexs,vector<vector<double> > nexs);
+
+	void train();
+	void printWeights()
+	{
+		for(auto ss:bstWeights) 
+		printf("%lf ",ss);
+	};
+private:
+	strategies mystr;
+	vector<vector<double> > posvecs;
+	vector<vector<double> > negvecs;
+	vector<double> bstWeights;
+	vector<double> stps;
+	vector<vector<double> > lowHighBands;
+
+	void trainOneAtOnce();
+	void trainAllAtOnce();
+};
+
 
 static vector<vector<double > > prepareData(vector<featype> allfeas, vector<vector<double> > TrmTx, bool addPos)
 {

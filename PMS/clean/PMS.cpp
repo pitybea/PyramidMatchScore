@@ -1013,7 +1013,7 @@ double multiIVecDvec(vector<int> ivec,vector<double> dvec)
 	}
 	return result;
 }
-
+/*
 int PMStrainer::DecideBestScore(vector<double> temWeight,vector<vector<int> > posnums,vector<vector<int> > negnums,double& divValue)
 {
 	if(posnums.size()==0||negnums.size()==0)
@@ -1103,9 +1103,9 @@ int PMStrainer::DecideBestScore(vector<double> temWeight,vector<vector<int> > po
 	divValue=(allWeights[orderIdx[bestPosition]]+allWeights[orderIdx[bestPosition+1]])/2;
 	return bestNum;
 }
+*/
 
-
-	
+/*	
 PMStrainer::PMStrainer(PMStruc pm,TrainStrategy s,double d,double l,string ts)
 {
 	myStrgy=s;
@@ -1132,13 +1132,13 @@ void PMStrainer::Train(vector<vector<int> > posnums,vector<vector<int> > negnums
 		break;
 	}
 }
-
+*/
 void setDoubleVec(vector<double>& to,vector<double> frm)
 {
 	to.clear();
 	to.insert(to.end(),frm.begin(),frm.end());
 }
-
+/*
 void PMStrainer::trainOneAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums)
 {
 	vector<double> weights;
@@ -1170,7 +1170,7 @@ void PMStrainer::trainOneAtOnce(vector<vector<int> > posnums,vector<vector<int> 
 	bestNumber=bNum;
 	bestDivScore=bScore;
 	setDoubleVec(bestWeights,bWeights);
-}
+}*/
 
 bool endWhile(vector<double> jg,vector<double> tojg)
 {
@@ -1213,7 +1213,7 @@ void nextweights(vector<double> bd,vector<double>& wts,double stw)
 		
 	}
 }
-
+/*
 void PMStrainer::trainAllAtOnce(vector<vector<int> > posnums,vector<vector<int> > negnums)
 {
 
@@ -1265,7 +1265,7 @@ void PMStrainer::OutTofile()
 		fprintf(fp,"%lf\n",bestWeights[i]);
 	}
 	fclose(fp);
-}
+}*/
 /*
 double prW=weights[i-1];
 		double hBd=pmStrct.weights[i]*largeBand;
@@ -1504,4 +1504,187 @@ double PMSEnsemble::givePyramidMatchScore(vector<vector<double> > dataset)
 
 		return maxminValAndInx(rslts,true).second;
 	}
+}
+
+
+trainVecs:: trainVecs(trainVecs::strategies str,vector<vector<double> > lhb,vector<double> st,vector<vector<double> > pv,vector<vector<double> > nv)
+{
+	mystr=str;
+	lowHighBands=lhb;
+	stps=st;
+	posvecs=pv;
+	negvecs=nv;
+}
+
+void trainVecs::train()
+{
+	switch (mystr)
+	{
+	case trainVecs::allAtOnce:
+		trainAllAtOnce();
+		break;
+	case trainVecs::oneAtonce:
+		trainOneAtOnce();
+		break;
+	default:
+		break;
+	}
+}
+
+void trainVecs::trainOneAtOnce()
+{
+}
+
+vector<double> nextweights(vector<vector <double> > bds, vector<double> owts,vector<double> stws,int &which)
+{
+
+	vector<double> wts(owts);
+
+	int idx=wts.size()-1;
+	bool stpPr=false;
+	while(!stpPr)
+	{
+		wts[idx]+=stws[idx];
+		if(wts[idx]<bds[1][idx])
+		{
+			stpPr=true;
+			which=idx;
+			if(idx!=(wts.size()-1))
+			{
+				for(int i=idx+1;i<wts.size();i++)
+					wts[i]=bds[0][i];							
+			}
+
+		}
+		else
+		{
+			idx-=1;
+		}
+		if(idx==0)
+		{
+			stpPr=true;
+			break;
+		}
+
+		
+	}
+	return wts;
+}
+
+
+int DecideBestScore(vector<double> allWeights,vector<int> lblIdx,int allp,int alln)
+{
+	
+	prshl(allWeights,allWeights.size(),lblIdx);
+	int bestNum=-1;
+	int nnum=0;
+	int pnum=0;
+	
+	for (int i = 0; i < lblIdx.size(); i++)
+	{
+		if (lblIdx[i]==1)
+		{
+			pnum+=1;
+		}
+		else
+		{
+			nnum+=1;
+		}
+		
+		int crrctNum=nnum+allp-pnum;
+
+		if(crrctNum>bestNum)
+		{
+			bestNum=crrctNum;
+		}
+
+
+	}
+
+	return bestNum;
+}
+
+double multiIVecDvec(vector<double> ivec,vector<double> dvec,int frm)
+{
+
+	double result=0.0;
+	for (int i = 0; i < dvec.size(); i++)
+	{
+		result+=ivec[frm+i]*dvec[i];
+	}
+	return result;
+}
+
+void trainVecs::trainAllAtOnce()
+{
+	vector<double> tweights;
+	tweights.clear();
+	tweights.insert(tweights.end(),lowHighBands[0].begin(),lowHighBands[0].end());
+
+	vector<double> allScores;
+	allScores.resize(posvecs.size()+negvecs.size());
+
+	int allp=posvecs.size();
+	int alln=negvecs.size();
+
+	
+
+	vector<vector<double> > allvects;
+	allvects.clear();
+	allvects.insert(allvects.end(),posvecs.begin(),posvecs.end());
+	allvects.insert(allvects.end(),negvecs.begin(),negvecs.end());
+
+	vector<int> lblIdx;
+	lblIdx.clear();
+	vector<int> plbs(allp,1);
+	vector<int> nlbs(alln,-1);
+	lblIdx.insert(lblIdx.end(),plbs.begin(),plbs.end());
+	lblIdx.insert(lblIdx.end(),nlbs.begin(),nlbs.end());
+
+	for (int i = 0; i < allvects.size(); i++)
+	{
+		allScores[i]=multiIVecDvec(allvects[i],tweights,0);
+		
+	}
+	
+	vector<double> newweights;
+
+	int dim=posvecs[0].size();
+
+	int bestnum=-1;
+
+	while(!endWhile(lowHighBands[1],tweights))
+	{
+		int inx;
+		newweights=nextweights(lowHighBands,tweights,stps,inx);
+		
+		vector<double> diff;
+		diff.resize(dim-inx,0.0);
+		
+		for (int i = 0; i < diff.size(); i++)
+		{
+			diff[i]=newweights[inx+i]-tweights[inx+i];
+		}
+		
+		if (inx<4)
+		{
+			printf("%d ",inx);
+		}
+
+		for (int i = 0; i < allScores.size(); i++)
+		{
+			 allScores[i]+=multiIVecDvec(allvects[i],diff,inx);
+		}
+
+		int tnum=DecideBestScore(allScores,lblIdx,allp,alln);
+		
+		if (tnum>bestnum)
+		{
+			setDoubleVec(bstWeights,newweights);
+		}
+
+		setDoubleVec(tweights,newweights);
+
+	}
+
 }

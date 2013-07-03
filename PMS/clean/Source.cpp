@@ -544,9 +544,9 @@ int testPosWeight()
 
 	double ra=0.5;
 	
-	for (int i = 0; i < 19; i++)
+	for (int i = 0; i < 20; i++)
 	{
-		ra=0.05*(i+1);
+		ra=0.05*(i);
 		printf("-------------******************-----(%lf)--------**********************\n",ra);
 
 		testposspe(pedmd,dim,ra);
@@ -555,26 +555,42 @@ int testPosWeight()
 	return 0;
 }
 
+int trainweights()
+{
+	_chdir("E:\\project\\PyramidMatchScore\\PMS\\x64\\Release");
+	vector<vector<double> > allvals;
+	allvals=fileIOclass::InVectorSDouble("training.txt");
+	vector<vector<double> > pvals;
+	pvals.clear();
+	vector<vector<double> >nvals;
+	nvals.clear();
+
+	pvals.insert(pvals.end(),allvals.begin(),allvals.begin()+550);
+	nvals.insert(nvals.end(),allvals.begin()+550,allvals.end());
+
+	vector<vector<double> > lhbds;
+	vector<double> stps;
+	lhbds.resize(2,vector<double> (allvals[0].size(),0.0));
+	stps.resize(allvals[0].size(),0.0);
+
+	for (int i = 0; i < allvals[0].size(); i++)
+	{
+		double tm=pow(2.0,i+1);
+		lhbds[0][i]=0-tm;
+		lhbds[1][i]=tm;
+		stps[i]=tm/100.0;
+	}
+
+	trainVecs vec(trainVecs::allAtOnce,lhbds,stps,pvals,nvals);
+	vec.train();
+	printf("-------------******************-----()--------**********************\n");
+	vec.printWeights();
+	return 0;
+}
+
 int main()
 {
-	_chdir("E:\\carData\\TrainImages");
-	
-		int dim=10;
-	auto ad=getAllfeas(dim);
-	auto data=ad.first;
-	
-	_chdir("E:\\carData\\TestImages\\mytest");
-
-
-
-	PMStruc pedmd(PMStruc::postitionSpecific);
-	pedmd.generatePymFromdata(data);
-
-
-	double ra=0.0;
-	printf("-------------******************-----(%lf)--------**********************\n",ra);
-
-	testposspe(pedmd,dim,ra);
-
+	trainweights();
+	//genpostraining();
 	return 0;
 }
