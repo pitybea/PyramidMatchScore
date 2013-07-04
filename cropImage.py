@@ -31,7 +31,7 @@ def func(fl,p1,p2,p3):
             pt2=(x+100,y+40)
             #cv2.rectangle(img,pt1,pt2,(255,0,255),1) 
             roi=img[y if y>=0 else 0:y+40,x if x>=0 else 0:x+100]
-            imn='mytest%s-%d.pgm'%(p3,allcount+i)
+            imn='mytest%s-%d.png'%(p3,allcount+i)
             cv2.imwrite(imn,roi)
             print imn
             

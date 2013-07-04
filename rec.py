@@ -14,6 +14,8 @@ class recdel:
         ry=rc[0]
         return (x>=rx) & (x<=(rx+w)) & (y>=ry) & (y<=(ry+h))
     
+   
+        
     def ratio(self,rc1,rc2,sz):
         y1=rc1[0]
         x1=rc1[1]

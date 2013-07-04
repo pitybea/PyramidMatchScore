@@ -578,7 +578,7 @@ int trainweights()
 		double tm=pow(2.0,i+1);
 		lhbds[0][i]=0-tm;
 		lhbds[1][i]=tm;
-		stps[i]=tm/100.0;
+		stps[i]=tm/30.0;
 	}
 
 	trainVecs vec(trainVecs::allAtOnce,lhbds,stps,pvals,nvals);
