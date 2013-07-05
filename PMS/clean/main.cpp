@@ -19,12 +19,12 @@
 #include "PMS.h"
 
 
-static vector<int> oneNumber(string s,PMStruc ptem,vector<vector<double> > TrmTx,bool addPos)
+static vector<double> oneNumber(string s,PMStruc ptem,vector<vector<double> > TrmTx,bool addPos)
 {
 	string ts=s+"sift.txt";
 	vector<featype> vf=fileIOclass::InVector<featype> (ts);
 	vector<vector<double> > tomatch=prepareData(vf,TrmTx,addPos);
-	vector<int> result;
+	vector<double> result;
 	ptem.givePyramidMatchScore(tomatch,true,result);
 
 	return result;
@@ -102,8 +102,8 @@ static void generateNumsForPosTraining()
 	vector<string> posInames=fileIOclass::InVectorString("pos.txt");
 	vector<string> negInames=fileIOclass::InVectorString("neg.txt");
 	
-	vector<vector<int> > posnumbers;
-	vector<vector<int> > negnumbers;
+	vector<vector<double> > posnumbers;
+	vector<vector<double> > negnumbers;
 	for(string s:posInames)
 		posnumbers.push_back(oneNumber(s,ptem,TrmTx,true));
 

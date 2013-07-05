@@ -5,7 +5,9 @@
 #include <assert.h>
 using namespace std;
 
-#define LevelLimit 6
+
+
+#include <set>
 
 struct Point
 {
@@ -342,11 +344,39 @@ static int posorder[36][2]=
 	0,0
 	};
 
+static vector<vector<pair<int,int> > > genPAorders(int n)
+{
+	int m=2*(n-1);
+	vector<vector<pair<int,int> > > rslt;
+
+	for (int i = m; i >=0; i--)
+	{
+		vector<pair<int,int> > lvl;
+		lvl.clear();
+
+		int s=((i>=(n-1))?(n-1):i);
+		int t=i-s;
+
+		while ( (t>=0) && (s<=(n-1)) && (t<=(n-1)) && (s>=0) )
+		{
+			lvl.push_back(pair<int,int>(s,t));
+			s-=1;
+			t=i-s;
+		}
+
+
+		rslt.push_back(lvl);
+
+	}
+	return rslt;
+};
+
 class PMStruc
 {
 public:
 	enum PyrMode{normal,/*average,*/inverse,postitionSpecific};
 	PMStruc(PyrMode p);
+	PMStruc(PyrMode p,int);
 	PMStruc(){};
 
 	PyrMode mymode;
@@ -359,7 +389,9 @@ public:
 
 	//int generatePosPymsFromdata(vector<vector<double> > data);
 
-	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
+
+	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<double>& scoreAllLevel);
+	
 	void outToAFile(string filename);
 	void loadFromAFile(string filename);
 	
@@ -384,12 +416,14 @@ private:
 //	bool dataToPosPymLvl(vector<vector<double> > datas,int alvel,int plvel,map<int,map<int,int> >& pymlvl);
 
 
-	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel,bool inverse);
+	double MatchDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<double> & scoreAllLevel,bool inverse);
 //	double MatchDttoPymAv(vector<vector<double> > dataset,bool ExcluMode,vector<int> & scoreAllLevel);
-	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse,int order[LevelLimit*LevelLimit][2]);
+//	double MatchPosDttoPym(vector<vector<double> > dataset,bool ExcluMode,vector<int> & mnumbers,bool inverse,int order[LevelLimit*LevelLimit][2]);
+	double MatchDttoPosPym(vector<vector<double> > dataset,bool ExcluMode,vector<double> & mnumbers,bool inverse);
 
+	int matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv, bool ExcluMode );
 
-	int matchDToOneLv(vector<vector<double> >& dataset,int levl,map<int,map<int,int> > pmlv, bool ExcluMode );
+	vector<int> matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,bool ExcluMode,set<int> elimitset );
 //	int matchDToOneLv(vector<vector<double> > & dataset,int levl,map<int,map<int,int> > pmlv,vector<vector<double> > invs, bool ExcluMode );
 //	int matchDToOnePosLv(vector<vector<double> >& dataset,int alevl,int plevl,map<int,map<int,int> > pmlv, bool ExcluMode );
 	
@@ -411,8 +445,8 @@ private:
 	vector<vector<int>> twoExs;
 
 	int numOfData;
-	
-
+	int LevelLimit;// 6
+	vector<vector<pair<int,int> > > paOrders;
 };
 
 class PMSEnsemble
@@ -420,7 +454,7 @@ class PMSEnsemble
 public:
 	PMSEnsemble();
 	vector<vector<double>> weights;
-	int generateAaBsFromdata(vector<vector<double> > data);
+	int generateAaBsFromdata(vector<vector<double> > data,int);
 
 	int generateStructureFromData(vector<vector<vector<double> > > data);
 	double givePyramidMatchScore(vector<vector<double> > dataset);
