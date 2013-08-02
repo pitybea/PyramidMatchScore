@@ -17,6 +17,7 @@ struct Point
 	int y;
 };
 
+//this function will put position information at the begining of a vector (which is the last two dimensions)
 template<class T>
 vector<vector<T> > selectVecButLstTwo(vector<vector<T> > inp,int dim)
 {
@@ -29,8 +30,15 @@ vector<vector<T> > selectVecButLstTwo(vector<vector<T> > inp,int dim)
 		auto myd=inp[0].size();
 		for (auto ss:inp)
 		{
-			ss.erase(ss.begin()+dim, ss.begin()+myd-2 );
-			rslt.push_back(ss );
+			vector<T> rvec;
+			rvec.clear();
+			rvec.insert(rvec.end(),ss.begin()+myd-2,ss.end());
+			ss.erase(ss.begin()+dim, ss.end());
+
+			rvec.insert(rvec.end(),ss.begin(),ss.end());
+			
+
+			rslt.push_back(rvec );
 		}
 	}
 	return rslt;
@@ -294,4 +302,18 @@ static vector<vector<double> > addPositionsToData(vector<vector<double> > data,v
 		result[i].push_back(feas[i].pos.y);
 	}
 	return result;
+}
+
+template<class T>
+static pair<vector<vector<T> >,vector<vector<T> > > toTwo(vector<vector<T> > inp, int dim)
+{
+	pair<vector<vector<T> >,vector<vector<T> > > rslt;
+
+
+	for(auto ss: inp)
+	{
+		rslt.first.push_back(vector<T>(ss.begin(),ss.begin()+dim));
+		rslt.second.push_back(vector<T>(ss.begin()+dim,ss.end()) );
+	}
+	return rslt;
 }

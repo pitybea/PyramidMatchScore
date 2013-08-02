@@ -37,7 +37,7 @@ public:
 	enum PyrMode{postitionSpecific,positionsimple};
 	PMStruc(PyrMode p);
 	PMStruc(PyrMode p,int);
-	PMStruc(PyrMode p,int,int);
+	//PMStruc(PyrMode p,int,int);
 	PMStruc(){};
 
 	PyrMode mymode;
@@ -45,7 +45,7 @@ public:
 
 	vector<double> weights;
 	 
-	int generatePymFromdata(vector<vector<double> > data);
+	int generatePymFromdata(vector<vector<double> > data,int);
 	
 	double givePyramidMatchScore(vector<vector<double> > dataset,bool ExcluMode,vector<double>& scoreAllLevel);
 
@@ -75,20 +75,23 @@ private:
 
 //	double MatchDttoPosPym(vector<vector<double> > dataset,bool ExcluMode,vector<double> & mnumbers,bool inverse);
 
+
+
 	double MatchDttoPosPymSimple(vector<vector<double> > dataset,bool ExcluMode,vector<double> & mnumbers,bool inverse);
 
 	double MatchDttoPosPymSimple(vector<vector<pair<int,int> > > vecFSs,vector<vector<double>> poss,bool ExcluMode,vector<double> & mnumbers,bool inverse);
 
-	int matchDToOneLvSimple(vector<vector<double> > dataset,int levl, bool ExcluMode,vector<bool>&  used);
+//	int matchDToOneLvSimple(vector<vector<double> > dataset,int levl, bool ExcluMode,vector<bool>&  used);
 
 	int matchDToOneLvSimple(vector<vector<pair<int,int> > > vecFSs,vector<vector<double>> poss,int levl, bool ExcluMode,vector<bool>& used );
 
 //	vector<int> matchDToOneLv(vector<vector<double> > dataset,int levl,map<int,map<int,int> > pmlv,bool ExcluMode,set<int> elimitset );
 
-	pair<int,int>  dataToTwoInx(int alvel,vector<double> data);
-	pair<int,int> dataToTwoPosInx(int lvel,vector<double> data);
+	pair<int,int>  dataToTwoInxWthoutPos(int alvel,vector<double> data);
 
-	void addpostoFS(pair<int,int>& fs,int lvel,vector<double> data);
+	pair<int,int> dataToTwoPosInx(int lvel,vector<double> data);
+	pair<int,int> dataToTwoPosInx(int lvel,vector<double> data,vector<pair<int,int> > inp);
+
 	
 	vector<unordered_map<int,unordered_map<int,int> > > pym;
 

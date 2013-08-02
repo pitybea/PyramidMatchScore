@@ -62,18 +62,13 @@ void newgivescoreshelp(PMStruc pedmd,int dim,string s)
 		vector<vector<double> > vecs;
 		vecs=selectVecButLstTwo ( tvd,dim);
 		vector<double> reslt;
-		pedmd.givePyramidMatchScore(vecs,false,reslt);
+		//pedmd.givePyramidMatchScore(vecs,false,reslt);
 		
-		vector<vector<double> > app=selectVec(vecs,dim);
-		vector<vector<double> >ps;
-		ps.resize(app.size(),vector<double>(2,0.0));
-		for (int i = 0; i < vecs.size(); i++)
-		{
-			for (int j = 0; j < 2; j++)
-			{
-				ps[i][j]=vecs[i][dim+j];
-			}
-		}
+		auto st=toTwo(vecs,2);
+
+		vector<vector<double> > app=st.second;
+		vector<vector<double> >ps=st.first;
+	
 
 		vector<vector<pair<int,int> > > fss;
 		for (int i = 0; i < app.size(); i++)
@@ -104,33 +99,12 @@ void givescoreshelp(PMStruc pedmd,int dim,string s,bool ada,bool another,adaboos
 		double siz=(double)tvd.size();
 		vector<double> result;
 		double score;
-		if(!another)
-			score=pedmd.givePyramidMatchScore(selectVecButLstTwo ( tvd,dim),false,result);
-		else
-			score=pedmd.givePyramidMatchScore(selectVec ( tvd,dim),false,result);
-		if(ada)
-		{
-			vector<double> to;
-			to.resize(result.size(),0.0);
-			for (int i = 0; i < result.size(); i++)
-			{
-				to[i]=(double)result[i]/siz;
-				printf("%lf ",to[i]);
-			}
-			printf("%lf\n",machine.classfy(to));
-		}
-		else
-		{
-			
-			/*vector<double> to;
-			to.resize(result.size(),0.0);
-			for (int i = 0; i < result.size(); i++)
-			{
-				to[i]=(double)result[i]/siz;
-				printf("%lf ",to[i]);
-			}*/
-			printf("%lf\n",score);
-		}
+	
+		score=pedmd.givePyramidMatchScore(selectVecButLstTwo ( tvd,dim),false,result);
+	
+	
+		printf("%lf\n",score);
+
 	}
 }
 
@@ -205,7 +179,7 @@ void testDimension(pair<vector<vector<double> >,vector<vector<vector<double> > >
 		auto data=ad.first;
 		PMStruc pedmd(PMStruc::postitionSpecific);
 		printf("-------------******************-----(%d)--------**********************\n",dim);
-		pedmd.generatePymFromdata(selectVecButLstTwo(data,dim));
+		pedmd.generatePymFromdata(selectVec(data,dim),dim-2);
 		givescores(pedmd,dim,false,false);
 }
 
@@ -258,7 +232,7 @@ int test_dimension_bynumber()
 	testDimension(ad,10);
 	testDimension(ad,15);
 	testDimension(ad,20);
-	testDimension(ad,30);
+
 
 	return 0;
 }
@@ -408,7 +382,7 @@ int test_basic()
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
 	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 	givescores(pedmd,dim,false,false);
 
 	return 0;
@@ -429,7 +403,7 @@ int no_app()
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
 
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 	givescores(pedmd,dim,false,false);
 	
 	return 0;
@@ -450,7 +424,7 @@ int no_pos()
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
 
-	pedmd.generatePymFromdata(selectVec(data,dim));
+	pedmd.generatePymFromdata(selectVec(data,dim),dim);
 	givescores(pedmd,dim,false,true);
 	
 	return 0;
@@ -466,7 +440,7 @@ int genpostraining()
 	
 	PMStruc pedmd(PMStruc::postitionSpecific);
 	//printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 	vector<string> flNms;
 	flNms.clear();
 	flNms=fileIOclass::InVectorString("positive.lst");
@@ -518,7 +492,7 @@ int gentraining()
 	
 	PMStruc pedmd(PMStruc::postitionSpecific);
 	//printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 	vector<string> flNms;
 	flNms.clear();
 	flNms=fileIOclass::InVectorString("positive.lst");
@@ -573,17 +547,17 @@ int testposspe()
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
 //	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 	givescores(pedmd,dim,false,false);
 
 	return 0;
 }
 
-int benchmark()
+int benchmark(int dim)
 {
 	_chdir("E:\\carData\\TrainImages");
 	
-	int dim=10;
+//	int dim=10;
 	auto ad=getAllfeas(dim);
 	auto data=ad.first;
 	
@@ -592,8 +566,8 @@ int benchmark()
 
 
 	PMStruc pedmd(PMStruc::positionsimple,5);
-//	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(data);
+	printf("-------------******************-----(%d)--------**********************\n",dim);
+	pedmd.generatePymFromdata(data,dim);
 	givescores(pedmd,dim,false,false);
 
 	return 0;
@@ -611,9 +585,9 @@ int splitmethod()
 
 
 
-	PMStruc pedmd(PMStruc::positionsimple,5,dim);
+	PMStruc pedmd(PMStruc::positionsimple,5);
 //	printf("-------------******************-----(%d)--------**********************\n",dim);
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 	givescoressplit(pedmd,dim,false,false);
 
 	return 0;
@@ -634,7 +608,7 @@ int testposLvlLmt()
 	{
 		PMStruc pedmd(PMStruc::postitionSpecific,i);
 		
-		pedmd.generatePymFromdata(data);
+		pedmd.generatePymFromdata(data,dim);
 		printf("-------------******************-----(%d)--------**********************\n",i);
 		givescores(pedmd,dim,false,false);
 	}
@@ -669,7 +643,7 @@ int testPosWeight()
 
 
 	PMStruc pedmd(PMStruc::postitionSpecific);
-	pedmd.generatePymFromdata(data);
+	pedmd.generatePymFromdata(data,dim);
 
 
 	double ra=0.5;
@@ -700,7 +674,7 @@ int testposLvlLmtRatio()
 	{
 		PMStruc pedmd(PMStruc::postitionSpecific,i);
 		
-		pedmd.generatePymFromdata(data);
+		pedmd.generatePymFromdata(data,dim);
 		printf("-------------******************-----(%d)--------**********************\n",i);
 		for (int j = 0; j < 20; j++)
 		{
@@ -779,6 +753,15 @@ int main()
 
 //	PMStruc pedmd(PMStruc::postitionSpecific,5);
 //	benchmark();
-	splitmethod();
+
+
+	benchmark(1);
+	benchmark(3);
+	benchmark(7);
+	benchmark(10);
+	benchmark(15);
+	benchmark(20);
+//	splitmethod();
+//	test_dimension_bynumber();
 	return 0;
 }
